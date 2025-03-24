@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+
+{% block title %}Flashcards - Plataforma{% endblock %}
+
+{% block content %}
+{% load static %}
+<div class="container mt-5 pt-4">
+    <div class="container d-flex justify-content-center mt-3">
+        <h1>Flashcards</h1>
+    </div>
+     <!-- Seleção de Categoria -->
+    <div class="container d-flex justify-content-center mt-3">
+        <select id="category-select" onchange="changeCategory()" class="form-select w-25">
+            <option value="saudacoes">Saudações</option>
+            <option value="comidas">Comidas</option>
+            <option value="cores">Cores</option>
+            <option value="familia">Família</option>
+            <option value="viagem">Viagem</option>
+        </select>
+    </div>
+
+    <!-- Flashcard -->
+    <div class="container d-flex justify-content-center mt-5">
+        <div id="flashcard-container" class="flashcard" onclick="flipFlashcard()">
+            <div id="flashcard" class="flashcard-inner">
+                <div id="flashcard-front" class="flashcard-front">
+                    <p id="flashcard-content">Hello</p>
+                </div>
+                <div class="flashcard-back">
+                    <button id="play-audio-btn" class="btn btn-light mt-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-soundwave bi-2x" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd" d="M8.5 2a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-1 0v-11a.5.5 0 0 1 .5-.5m-2 2a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5m-6 1.5A.5.5 0 0 1 5 6v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m8 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m-10 1A.5.5 0 0 1 3 7v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5m12 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5"/>
+                        </svg>
+                    </button>
+                    <p id="flashcard-back-content">Olá</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Botão para avançar para o próximo flashcard -->
+    <div class="container d-flex justify-content-center mt-5">
+        <button onclick="nextFlashcard()" class="btn btn-dark mt-4">Próxima</button>
+    </div>
+
+    <!-- Barra de Progresso -->
+    <div class="container d-flex justify-content-center mt-3">
+        <progress id="progress-bar" value="0" max="100"></progress>
+    </div>
+    <div class="row" style="margin-top: 20px;">
+        <div class="position-absolute top-50 start-0">
+            <a href="{% url 'praticar' %}" class="btn btn-warning">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16"  style="transform: scale(1.5);">
+                    <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0z"/>
+                    <path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Estilo e Script -->
+<style>
+    /* Estilo da barra de progresso */
+    progress {
+        width: 300px; /* Largura da barra */
+        height: 20px; /* Altura da barra */
+        border-radius: 10px; /* Bordas arredondadas */
+        background-color: #f3f3f3; /* Cor de fundo */
+    }
+
+    progress::-webkit-progress-bar {
+        background-color: #f3f3f3;
+        border-radius: 10px;
+    }
+
+    progress::-webkit-progress-value {
+        background-color: #1bd20d; /* Cor da barra de progresso */
+        border-radius: 10px;
+    }
+
+    progress::-moz-progress-bar {
+        background-color: #1bd20d; /* Cor da barra de progresso para Firefox */
+        border-radius: 10px;
+    }
+    .flashcard-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh; /* Garante centralização vertical */
+        flex-direction: column;
+    }
+
+    .flashcard {
+        width: 400px;
+        height: 250px;
+        perspective: 1000px;
+    }
+
+    /* Efeito de flip */
+    .flashcard-inner {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+    }
+
+    .flipped {
+        transform: rotateY(180deg);
+    }
+
+    /* Estiliza frente e verso */
+    .flashcard-front, .flashcard-back {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        backface-visibility: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2rem;
+        border-radius: 10px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .flashcard-front {
+        background: #1bd20d;
+        color: white;
+    }
+
+    .flashcard-back {
+        background: #30ddd1;
+        color: white;
+        transform: rotateY(180deg);
+    }
+
+    #play-audio-btn {
+    position: absolute; /* Posiciona o botão de forma absoluta dentro do .flashcard-back */
+    bottom: 10px; /* Distância do fundo */
+    right: 10px; /* Distância da direita */
+    margin: 0; /* Remove margens padrão */
+    }
+    /* Estiliza botão */
+    .btn-custom {
+        margin-top: 20px;
+        font-size: 1.2rem;
+        padding: 10px 20px;
+    }
+</style>
+
+<script>
+    const categories = {
+    saudacoes: [
+        { front: "Hello", back: "Olá", audio: "{% static 'audios/hello.mp3' %}" },
+        { front: "Goodbye", back: "Adeus", audio: "{% static 'audios/goodbye.mp3' %}" },
+        { front: "Please", back: "Por favor", audio: "{% static 'audios/please.mp3' %}" },
+        { front: "Thank you", back: "Obrigado", audio: "{% static 'audios/thank_you.mp3' %}" },
+        { front: "Good morning", back: "Bom dia", audio: "{% static 'audios/good_morning.mp3' %}" }, 
+        { front: "Good afternoon", back: "Boa tarde", audio: "{% static 'audios/boatarde.mp3' %}" }, 
+        { front: "Good night", back: "Boa noite", audio: "{% static 'audios/boanoite.mp3' %}" }, 
+        { front: "Excuse me", back: "Com licença", audio: "{% static 'audios/comlicenca.mp3' %}" }, 
+        { front: "Sorry", back: "Desculpe", audio: "{% static 'audios/desculpee.mp3' %}" }, 
+        { front: "How are you?", back: "Como você está?", audio: "{% static 'audios/comovcesta.mp3' %}" }, 
+        { front: "I'm fine", back: "Estou bem", audio: "{% static 'audios/estoubem.mp3' %}" }, 
+        { front: "See you later", back: "Até mais tarde", audio: "{% static 'audios/atemais.mp3' %}" }, 
+        { front: "Nice to meet you", back: "Prazer em conhecê-lo", audio: "{% static 'audios/prazer.mp3' %}" }
+    ],
+    
+    comidas: [
+        { front: "Apple", back: "Maçã" },
+        { front: "Banana", back: "Banana" },
+        { front: "Pizza", back: "Pizza" },
+        { front: "Rice", back: "Arroz" },
+        { front: "Beans", back: "Feijão" },
+        { front: "Bread", back: "Pão" },
+        { front: "Cheese", back: "Queijo" },
+        { front: "Chicken", back: "Frango" },
+        { front: "Fish", back: "Peixe" },
+        { front: "Egg", back: "Ovo" },
+        { front: "Salad", back: "Salada" },
+        { front: "Soup", back: "Sopa" },
+        { front: "Juice", back: "Suco" }
+    ],
+    cores: [
+        { front: "Red", back: "Vermelho" },
+        { front: "Blue", back: "Azul" },
+        { front: "Green", back: "Verde" },
+        { front: "Yellow", back: "Amarelo" },
+        { front: "Black", back: "Preto" },
+        { front: "White", back: "Branco" },
+        { front: "Orange", back: "Laranja" },
+        { front: "Purple", back: "Roxo" },
+        { front: "Pink", back: "Rosa" },
+        { front: "Gray", back: "Cinza" },
+        { front: "Brown", back: "Marrom" },
+        { front: "Gold", back: "Dourado" },
+        { front: "Silver", back: "Prata" }
+    ],
+    familia: [
+        { front: "Father", back: "Pai" },
+        { front: "Mother", back: "Mãe" },
+        { front: "Son", back: "Filho" },
+        { front: "Daughter", back: "Filha" },
+        { front: "Brother", back: "Irmão" },
+        { front: "Sister", back: "Irmã" },
+        { front: "Grandfather", back: "Avô" },
+        { front: "Grandmother", back: "Avó" },
+        { front: "Uncle", back: "Tio" },
+        { front: "Aunt", back: "Tia" },
+        { front: "Cousin", back: "Primo/Prima" },
+        { front: "Nephew", back: "Sobrinho" },
+        { front: "Niece", back: "Sobrinha" }
+    ],
+    viagem: [
+        { front: "Airport", back: "Aeroporto" },
+        { front: "Passport", back: "Passaporte" },
+        { front: "Ticket", back: "Bilhete" },
+        { front: "Hotel", back: "Hotel" },
+        { front: "Suitcase", back: "Mala" },
+        { front: "Map", back: "Mapa" },
+        { front: "Taxi", back: "Táxi" },
+        { front: "Beach", back: "Praia" },
+        { front: "Mountain", back: "Montanha" },
+        { front: "Tourist", back: "Turista" },
+        { front: "Flight", back: "Voo" },
+        { front: "Luggage", back: "Bagagem" },
+        { front: "Destination", back: "Destino" }
+        ]
+    };
+
+    let currentCategory = categories.saudacoes;
+    let currentFlashcard = 0;
+    let isFlipped = false;
+
+    function flipFlashcard() {
+        const flashcard = document.getElementById('flashcard');
+        if (isFlipped) {
+            flashcard.style.transform = "rotateY(0deg)";
+        } else {
+            flashcard.style.transform = "rotateY(180deg)";
+        }
+        isFlipped = !isFlipped;
+    }
+
+    let currentAudio = null; // Variável para armazenar o objeto de áudio atual
+
+    function playAudio() {
+        const audioPath = currentCategory[currentFlashcard].audio; // Caminho do áudio atual
+        if (audioPath) {
+            if (currentAudio) {
+                currentAudio.pause(); // Pausa o áudio atual, se houver
+                currentAudio.currentTime = 0; // Reinicia o áudio
+            }
+            currentAudio = new Audio(audioPath); // Cria um novo objeto de áudio
+            currentAudio.play(); // Reproduz o áudio
+        }
+    }
+    // Adiciona um evento de clique ao botão de play
+    document.getElementById('play-audio-btn').addEventListener('click', function(event) {
+        event.stopPropagation(); // Impede a propagação do evento para o elemento pai
+        playAudio(); // Reproduz o áudio
+    });
+
+    // Adiciona um evento de clique ao botão de play
+    document.getElementById('play-audio-btn').addEventListener('click', playAudio);
+
+    function nextFlashcard() {
+    const flashcard = document.getElementById('flashcard');
+    
+    // Pausa o áudio atual, se houver
+    if (currentAudio) {
+        currentAudio.pause();
+        currentAudio.currentTime = 0;
+    }
+
+    // Garante que a carta volte à posição inicial antes de mudar o conteúdo
+    flashcard.style.transform = "rotateY(0deg)";
+    isFlipped = false;
+
+    // Adiciona um pequeno atraso para evitar que o novo conteúdo apareça antes da rotação terminar
+    setTimeout(() => {
+        currentFlashcard = (currentFlashcard + 1) % currentCategory.length;
+        document.getElementById('flashcard-content').textContent = currentCategory[currentFlashcard].front;
+        document.getElementById('flashcard-back-content').textContent = currentCategory[currentFlashcard].back;
+
+            // Atualiza a barra de progresso
+            updateProgressBar();
+        }, 300); // Tempo suficiente para a animação completar
+    }
+
+    function updateProgressBar() {
+        const progressBar = document.getElementById('progress-bar');
+        const progress = ((currentFlashcard + 1) / currentCategory.length) * 100; // Calcula o progresso em porcentagem
+        progressBar.value = progress; // Atualiza o valor da barra de progresso
+    }
+
+    function changeCategory() {
+        const selectedCategory = document.getElementById('category-select').value;
+        currentCategory = categories[selectedCategory];
+        currentFlashcard = 0;
+        document.getElementById('flashcard-content').textContent = currentCategory[currentFlashcard].front;
+        document.getElementById('flashcard-back-content').textContent = currentCategory[currentFlashcard].back;
+        document.getElementById('flashcard').style.transform = "rotateY(0deg)"; // Reseta o flip
+        isFlipped = false;
+
+        // Reinicia a barra de progresso
+        updateProgressBar();
+    }
+</script>
+
+{% endblock %}

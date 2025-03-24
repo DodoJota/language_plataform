@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Praticar - Jogos{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+  <div style="text-align: center; font-family: Arial; font-size: 36px; font-weight: lighter;">
+    <h1>É hora de testar os seus conhecimentos!</h1>
+  </div>
+  <div class="row">
+    <!-- Card de Flashcards -->
+    <div class="col-md-4">
+      <div class="card">
+        {% load static %}
+        <img src="{% static 'images/flashcards.jpg' %}" class="card-img-top" alt="Flashcards">
+        <div class="card-body">
+          <h5 class="card-title">Flashcards</h5>
+          <p class="card-text">Pratique vocabulário com flashcards interativos.</p>
+          <a href="{% url 'flashcards' %}" class="btn btn-primary">Praticar</a>
+        </div>
+      </div>
+    </div>
+    <!-- Card de Speech -->
+    <div class="col-md-4">
+      <div class="card">
+        {% load static %}
+        <img src="{% static 'images/speech.jpg' %}" class="card-img-top" alt="Speech">
+        <div class="card-body">
+          <h5 class="card-title">Pronúncia</h5>
+          <p class="card-text">Pratique a pronuncia de palavras corretamente</p>
+          <a href="{% url 'speech' %}" class="btn btn-primary">Praticar</a>
+        </div>
+      </div>
+    </div>
+    <!-- Card de Gramática -->
+    <div class="col-md-4">
+      <div class="card">
+        {% load static %}
+        <img src="{% static 'images/gramatica.jpg' %}" class="card-img-top" alt="gramatica">
+        <div class="card-body">
+          <h5 class="card-title">Verbos</h5>
+          <p class="card-text">Pratique a conjugação dos principais verbos.</p>
+          <a href="{% url 'gramatica' %}" class="btn btn-primary">Praticar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Nome da plataforma{% endblock %}
+
+{% block content %}
+{% load static %}
+
+<!-- Conteúdo principal -->
+<div class="content">
+  <div class="container mt-5">
+    <h1 class="text-center">Materiais de Apoio</h1>
+    <p class="text-center">Baixe os materiais de estudo abaixo:</p>
+    <div class="row mt-4">
+      
+      <!-- Card para Material 1 -->
+      <div class="col-md-4">
+        <div class="card card-yellow">
+          <div class="card-body">
+            <h5 class="card-title">Livro 1</h5>
+            <p class="card-text">Baixe o livro 1 completo.</p>
+            <a href="{% static 'downloads/livro_matematica.pdf' %}" class="btn btn-primary" download>Download PDF</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card para Material 2 -->
+      <div class="col-md-4">
+        <div class="card card-blue">
+          <div class="card-body">
+            <h5 class="card-title">Guia 2</h5>
+            <p class="card-text">Baixe o guia 2 completo.</p>
+            <a href="{% static 'downloads/guia_fisica.pdf' %}" class="btn btn-primary" download>Download PDF</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card para Material 3 -->
+      <div class="col-md-4">
+        <div class="card card-red">
+          <div class="card-body">
+            <h5 class="card-title">Livro 3</h5>
+            <p class="card-text">Baixe o livro 3 completo.</p>
+            <a href="{% static 'downloads/apostila_quimica.pdf' %}" class="btn btn-primary" download>Download PDF</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}

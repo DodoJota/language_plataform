@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Nome da plataforma{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5">
+    <h1>Bem-vindo à Plataforma</h1>
+    
+    <div class="row">
+        <div class="col-md-4">
+            {% load static %}
+            <div class="card">
+                <img src="{% static 'images/curso.jpg' %}" alt="aulas">
+                <div class="card-body">
+                    <h5 class="card-title">Aulas</h5>
+                    <p class="card-text">Aqui você vai encontrar todas as aulas sobre o assunto para que possa aprender e ensinar!</p>
+                    <a href="{% url 'aulas' %}" class="btn btn-primary">Acessar aulas</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card">
+                <img src="{% static 'images/material2.jpg' %}" alt="materiais">
+                <div class="card-body">
+                    <h5 class="card-title">Materiais de apoio</h5>
+                    <p class="card-text">Aqui você poderá fazer consultar e fazer o download de materias de apoio incríveis!</p>
+                    <a href="{% url 'materiais' %}" class="btn btn-primary">Ver materiais</a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card">
+                <img src="{% static 'images/flashcards.jpg' %}" alt="praticar">
+                <div class="card-body">
+                    <h5 class="card-title">Hands-on</h5>
+                    <p class="card-text">Ponha em prática todo o aprendizado conquistado através de exercícios e jogos!</p>
+                    <a href="{% url 'praticar' %}" class="btn btn-primary">Praticar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

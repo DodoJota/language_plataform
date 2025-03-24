@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block title %}Praticar - Gramática{% endblock %}
+
+{% block content %}
+<div class="container mt-5 pt-5 d-flex flex-column align-items-center">
+  <h1>Gramática</h1>
+  <p>Pratique a gramática do idioma com nossos exercícios interativos.</p>
+
+  <select id="category-select" onchange="changeCategory()" class="form-select w-25 mb-3">
+    <option value="verbos-regulares">Verbos Regulares</option>
+    <option value="verbos-irregulares">Verbos Irregulares</option>
+    <option value="verbos-de-acao">Verbos de Ação</option>
+    <option value="verbos-de-estado">Verbos de Estado</option>
+  </select>
+
+  <button id="start-button" class="btn btn-primary mb-3">Iniciar Exercício</button>
+  <div class="row" style="margin-top: 20px;">
+    <div class="position-absolute top-50 start-0">
+        <a href="{% url 'praticar' %}" class="btn btn-warning">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16"  style="transform: scale(1.5);">
+                <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0z"/>
+                <path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708z"/>
+            </svg>
+        </a>
+    </div>
+  </div>
+  <div id="exercise-container" style="display: none; width: 50%;">
+    <div class="card">
+      <div class="card-body">
+        <h5 id="sentence-to-complete"></h5>
+        <input id="answer-input" type="text" class="form-control mb-3" placeholder="Resposta">
+        <button id="check-answer-button" class="btn btn-success mb-3">Verificar Resposta</button>
+        <p id="result"></p>
+      </div>
+    </div>
+    <button id="next-verb-button" class="btn btn-secondary mt-3" style="display: none;">Próxima Palavra</button>
+  </div>
+</div>
+
+<script>
+  const startButton = document.getElementById('start-button');
+  const exerciseContainer = document.getElementById('exercise-container');
+  const sentenceToComplete = document.getElementById('sentence-to-complete');
+  const answerInput = document.getElementById('answer-input');
+  const checkAnswerButton = document.getElementById('check-answer-button');
+  const nextVerbButton = document.getElementById('next-verb-button');
+  const result = document.getElementById('result');
+  let currentSentence = null;
+  let currentCategory = 'verbos-regulares';
+
+  startButton.addEventListener('click', () => {
+    exerciseContainer.style.display = 'block';
+    startButton.style.display = 'none';
+    startExercise();
+  });
+
+  checkAnswerButton.addEventListener('click', () => {
+    checkAnswer();
+  });
+
+  nextVerbButton.addEventListener('click', () => {
+    startExercise();
+  });
+
+  function startExercise() {
+    const sentences = {
+      'verbos-regulares': [
+        {
+          sentence: 'Eu ________ (ser) um estudante.',
+          answer: 'sou'
+        },
+        {
+          sentence: 'Você ________ (ter) um carro?',
+          answer: 'tem'
+        },
+        {
+          sentence: 'Nós ________ (estar) no parque.',
+          answer: 'estamos'
+        }
+      ],
+      'verbos-irregulares': [
+        {
+          sentence: 'Eu ________ (ir) ao cinema.',
+          answer: 'vou'
+        },
+        {
+          sentence: 'Você ________ (fazer) o que você quer.',
+          answer: 'faz'
+        },
+        {
+          sentence: 'Nós ________ (ter) um problema.',
+          answer: 'temos'
+        }
+      ],
+      'verbos-de-acao': [
+        {
+          sentence: 'Eu ________ (correr) todos os dias.',
+          answer: 'corro'
+        },
+        {
+          sentence: 'Você ________ (estudar) para a prova.',
+          answer: 'estuda'
+        },
+        {
+          sentence: 'Nós ________ (jogar) futebol.',
+          answer: 'jogamos'
+        }
+      ],
+      'verbos-de-estado': [
+        {
+          sentence: 'Eu ________ (ser) feliz.',
+          answer: 'sou'
+        },
+        {
+          sentence: 'Você ________ (estar) cansado.',
+          answer: 'está'
+        },
+        {
+          sentence: 'Nós ________ (ter) fome.',
+          answer: 'temos'
+        }
+      ]
+    };
+    currentSentence = sentences[currentCategory][Math.floor(Math.random() * sentences[currentCategory].length)];
+    sentenceToComplete.textContent = currentSentence.sentence;
+    answerInput.value = '';
+    result.textContent = '';
+    nextVerbButton.style.display = 'none';
+  }
+
+  function checkAnswer() {
+    const answer = answerInput.value.trim();
+    if (answer === '') {
+      result.textContent = 'Por favor, insira uma resposta.';
+      return;
+    }
+    if (answer.toLowerCase() === currentSentence.answer.toLowerCase()) {
+      result.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i> Resposta correcta!';
+      result.className = 'text-success';
+    } else {
+      result.innerHTML = '<i class="bi bi-x-circle-fill text-danger"></i> Resposta incorrecta. Tente outra vez!';
+      result.className = 'text-danger';
+    }
+    nextVerbButton.style.display = 'block';
+  }
+
+  function changeCategory() {
+    currentCategory = document.getElementById('category-select').value;
+    startExercise();
+  }
+</script>
+{% endblock %}
