@@ -1,1 +1,1 @@
-gunicorn language.wsgi:application --bind 0.0.0.0:$PORT
+gunicorn plataforms.wsgi:application --bind 0.0.0.0:$PORT
