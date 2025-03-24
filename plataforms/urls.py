@@ -22,7 +22,6 @@ from language import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('language.urls')),  # Inclui as rotas do app 'language'
-    path('language/', include('language.urls')),
     path('accounts/login/', views.login_view, name='login'),
     path('accounts/', include('django.contrib.auth.urls')),
-]   
+]

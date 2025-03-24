@@ -125,9 +125,14 @@
             <button type="submit">Entrar</button>
 
             <!-- Mensagem de erro -->
-            {% if erro %}
-                <p class="erro">{{ erro }}</p>
+            {% if messages %}
+            <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+            </ul>
             {% endif %}
+
         </form>       
 
         <!-- Botão de Registo -->
