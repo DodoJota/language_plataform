@@ -1,0 +1,377 @@
+{% extends 'base.html' %}
+
+{% block title %}Flashcards - Plataforma{% endblock %}
+
+{% block body_class %}bg-custom-flash{% endblock %}
+
+{% block content %}
+{% load static %}
+<div class="container mt-1">
+    <!-- Título e Informações (canto superior esquerdo) -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="text-left mb-4">
+                <h1 class="display-4">Flashcards</h1>
+                <p class="lead">Pratique seu vocabulário com flashcards interativos!</p>
+                <p class="text-muted">Selecione uma categoria e comece a praticar. Após ver a resposta, marque se acertou ou errou.</p>
+            </div>
+        </div>
+
+        <!-- Painel de Progresso (canto superior direito) -->
+        <div class="col-md-6">
+            <div class="card float-end" style="width: 18rem;">
+                <div class="card-body">
+                    <h5>Progresso</h5>
+                    <p>Acertos: <span id="correct-count">0</span></p>
+                    <p>Erros: <span id="incorrect-count">0</span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Seleção de Categoria e Cartas (centro da tela) -->
+    <div class="row justify-content-center mt-1">
+        <div class="col-md-8 text-center">
+            <!-- Seleção de Categoria -->
+            <div class="mb-4">
+                <select id="category-select" onchange="changeCategory()" class="form-select w-50 mx-auto shadow-sm">
+                    <option value="saudacoes">Saudações</option>
+                    <option value="comidas">Comidas</option>
+                    <option value="cores">Cores</option>
+                    <option value="familia">Família</option>
+                    <option value="viagem">Viagem</option>
+                </select>
+            </div>
+
+            <!-- Flashcard com Efeito de Baralho -->
+            <div class="flashcard-container">
+                <!-- Cartas de sombra -->
+                <div class="flashcard-shadow"></div>
+                <div class="flashcard-shadow"></div>
+                <div class="flashcard-shadow"></div>
+
+                <!-- Flashcard principal -->
+                <div id="flashcard-container" class="flashcard" onclick="flipFlashcard()">
+                    <div id="flashcard" class="flashcard-inner">
+                        <div id="flashcard-front" class="flashcard-front">
+                            <p id="flashcard-content" class="display-4">Hello</p>
+                        </div>
+                        <div class="flashcard-back">
+                            <button id="play-audio-btn" class="btn btn-dark btn-circle">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-soundwave" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M8.5 2a.5.5 0 0 1 .5.5v11a.5.5 0 0 1-1 0v-11a.5.5 0 0 1 .5-.5m-2 2a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5m4 0a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5m-6 1.5A.5.5 0 0 1 5 6v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m8 0a.5.5 0 0 1 .5.5v4a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m-10 1A.5.5 0 0 1 3 7v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5m12 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0V7a.5.5 0 0 1 .5-.5"/>
+                                </svg>
+                            </button>
+                            <p id="flashcard-back-content" class="display-4">Olá</p>
+                            <div id="pronunciation-tip" class="mt-3 text-muted" style="font-size: 1.2rem;">
+                                Pronúncia: <span id="pronunciation-text">/oˈla/</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botões de Acerto e Erro -->
+            <div class="container d-flex justify-content-center mt-4">
+                <button onclick="markCorrect()" class="btn btn-success me-2">Acertou</button>
+                <button onclick="markIncorrect()" class="btn btn-danger">Errou</button>
+            </div>
+
+            <!-- Botão para avançar para o próximo flashcard -->
+            <div class="container d-flex justify-content-center mt-4">
+                <button onclick="nextFlashcard()" class="btn btn-dark btn-lg shadow-sm">Próxima</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estilo e Script -->
+<style>
+    /* Estilo da barra de progresso */
+    .progress-bar-custom {
+        width: 300px;
+        height: 20px;
+        border-radius: 10px;
+        background-color: #f3f3f3;
+    }
+
+    .progress-bar-custom::-webkit-progress-bar {
+        background-color: #f3f3f3;
+        border-radius: 10px;
+    }
+
+    .progress-bar-custom::-webkit-progress-value {
+        background-color: #1bd20d;
+        border-radius: 10px;
+        transition: width 0.5s ease-in-out;
+    }
+
+    .progress-bar-custom::-moz-progress-bar {
+        background-color: #1bd20d;
+        border-radius: 10px;
+    }
+
+    /* Efeito de baralho */
+    .flashcard-container {
+        position: relative;
+        width: 400px;
+        height: 300px;
+        margin: 0 auto;
+    }
+
+    .flashcard-shadow {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background: #1bd20d; /* Verde da carta */
+        border-radius: 15px;
+        box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+        top: 5px;
+        left: 5px;
+        z-index: -1;
+    }
+
+    .flashcard-shadow:nth-child(2) {
+        top: 10px;
+        left: 10px;
+        z-index: -2;
+    }
+
+    .flashcard-shadow:nth-child(3) {
+        top: 15px;
+        left: 15px;
+        z-index: -3;
+    }
+
+    /* Estilo do flashcard */
+    .flashcard {
+        width: 100%;
+        height: 100%;
+        perspective: 1000px;
+        cursor: pointer;
+        position: relative;
+        z-index: 1;
+    }
+
+    .flashcard-inner {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        transition: transform 0.6s;
+        transform-style: preserve-3d;
+    }
+
+    .flipped {
+        transform: rotateY(180deg);
+    }
+
+    .flashcard-front, .flashcard-back {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        backface-visibility: hidden;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 2rem;
+        border-radius: 15px;
+        box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease-in-out;
+    }
+
+    .flashcard-front {
+        background: linear-gradient(135deg, #1bd20d, #17a80d);
+        color: white;
+    }
+
+    .flashcard-back {
+        background: linear-gradient(135deg, #30ddd1, #2ab5ab);
+        color: white;
+        transform: rotateY(180deg);
+        flex-direction: column;
+    }
+
+    /* Botão de play */
+    .btn-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        bottom: 20px;
+        right: 20px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Botão de voltar */
+    .btn-warning.btn-circle {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Dica de Pronúncia */
+    #pronunciation-tip {
+        text-align: center;
+        margin-top: 10px;
+    }
+</style>
+
+<script>
+    const categories = {
+        saudacoes: [
+            { front: "Hello", back: "Olá", audio: "{% static 'audios/hello.mp3' %}", pronunciation: "/oˈla/" },
+            { front: "Goodbye", back: "Adeus", audio: "{% static 'audios/goodbye.mp3' %}", pronunciation: "/ɐˈdewʃ/" },
+            { front: "Please", back: "Por favor", audio: "{% static 'audios/please.mp3' %}", pronunciation: "/poɾ faˈvoɾ/" },
+            { front: "Thank you", back: "Obrigado", audio: "{% static 'audios/thank_you.mp3' %}", pronunciation: "/obɾiˈɡadu/" },
+            { front: "Good morning", back: "Bom dia", audio: "{% static 'audios/good_morning.mp3' %}", pronunciation: "/bõ ˈdiɐ/" },
+            { front: "Good afternoon", back: "Boa tarde", audio: "{% static 'audios/boatarde.mp3' %}", pronunciation: "/boɐ ˈtaɾdʒi/" },
+            { front: "Good night", back: "Boa noite", audio: "{% static 'audios/boanoite.mp3' %}", pronunciation: "/boɐ ˈnojtʃi/" },
+            { front: "Excuse me", back: "Com licença", audio: "{% static 'audios/comlicenca.mp3' %}", pronunciation: "/kõ liˈsẽsɐ/" },
+            { front: "Sorry", back: "Desculpe", audio: "{% static 'audios/desculpee.mp3' %}", pronunciation: "/dʒisˈkuɫpi/" },
+            { front: "How are you?", back: "Como você está?", audio: "{% static 'audios/comovcesta.mp3' %}", pronunciation: "/ˈkomu voˈse esˈta/" },
+            { front: "I'm fine", back: "Estou bem", audio: "{% static 'audios/estoubem.mp3' %}", pronunciation: "/esˈtow bẽj/" },
+            { front: "See you later", back: "Até mais tarde", audio: "{% static 'audios/atemais.mp3' %}", pronunciation: "/aˈtɛ majs ˈtaɾdʒi/" },
+            { front: "Nice to meet you", back: "Prazer em conhecê-lo", audio: "{% static 'audios/prazer.mp3' %}", pronunciation: "/pɾaˈzeɾ ẽj koɲeˈselu/" }
+        ],
+        comidas: [
+            { front: "Apple", back: "Maçã", pronunciation: "/mɐˈsɐ̃/" },
+            { front: "Banana", back: "Banana", pronunciation: "/bɐˈnɐ̃nɐ/" },
+            { front: "Pizza", back: "Pizza", pronunciation: "/ˈpitsɐ/" },
+            { front: "Rice", back: "Arroz", pronunciation: "/ɐˈʁos/" },
+            { front: "Beans", back: "Feijão", pronunciation: "/fejˈʒɐ̃w/" },
+            { front: "Bread", back: "Pão", pronunciation: "/pɐ̃w/" },
+            { front: "Cheese", back: "Queijo", pronunciation: "/ˈkejʒu/" },
+            { front: "Chicken", back: "Frango", pronunciation: "/ˈfɾɐ̃ɡu/" },
+            { front: "Fish", back: "Peixe", pronunciation: "/ˈpejʃi/" },
+            { front: "Egg", back: "Ovo", pronunciation: "/ˈovu/" },
+            { front: "Salad", back: "Salada", pronunciation: "/sɐˈladɐ/" },
+            { front: "Soup", back: "Sopa", pronunciation: "/ˈsopɐ/" },
+            { front: "Juice", back: "Suco", pronunciation: "/ˈsuku/" }
+        ],
+        cores: [
+            { front: "Red", back: "Vermelho", pronunciation: "/veɾˈmeʎu/" },
+            { front: "Blue", back: "Azul", pronunciation: "/ɐˈzuɫ/" },
+            { front: "Green", back: "Verde", pronunciation: "/ˈveɾdʒi/" },
+            { front: "Yellow", back: "Amarelo", pronunciation: "/ɐmɐˈɾelu/" },
+            { front: "Black", back: "Preto", pronunciation: "/ˈpɾetu/" },
+            { front: "White", back: "Branco", pronunciation: "/ˈbɾɐ̃ku/" },
+            { front: "Orange", back: "Laranja", pronunciation: "/lɐˈɾɐ̃ʒɐ/" },
+            { front: "Purple", back: "Roxo", pronunciation: "/ˈʁoʃu/" },
+            { front: "Pink", back: "Rosa", pronunciation: "/ˈʁozɐ/" },
+            { front: "Gray", back: "Cinza", pronunciation: "/ˈsĩzɐ/" },
+            { front: "Brown", back: "Marrom", pronunciation: "/mɐˈʁõ/" },
+            { front: "Gold", back: "Dourado", pronunciation: "/doˈɾadu/" },
+            { front: "Silver", back: "Prata", pronunciation: "/ˈpɾatɐ/" }
+        ],
+        familia: [
+            { front: "Father", back: "Pai", pronunciation: "/paj/" },
+            { front: "Mother", back: "Mãe", pronunciation: "/mɐ̃j/" },
+            { front: "Son", back: "Filho", pronunciation: "/ˈfiʎu/" },
+            { front: "Daughter", back: "Filha", pronunciation: "/ˈfiʎɐ/" },
+            { front: "Brother", back: "Irmão", pronunciation: "/iɾˈmɐ̃w/" },
+            { front: "Sister", back: "Irmã", pronunciation: "/iɾˈmɐ̃/" },
+            { front: "Grandfather", back: "Avô", pronunciation: "/ɐˈvo/" },
+            { front: "Grandmother", back: "Avó", pronunciation: "/ɐˈvɔ/" },
+            { front: "Uncle", back: "Tio", pronunciation: "/ˈtʃiu/" },
+            { front: "Aunt", back: "Tia", pronunciation: "/ˈtʃiɐ/" },
+            { front: "Cousin", back: "Primo/Prima", pronunciation: "/ˈpɾimu/ /ˈpɾimɐ/" },
+            { front: "Nephew", back: "Sobrinho", pronunciation: "/soˈbɾiɲu/" },
+            { front: "Niece", back: "Sobrinha", pronunciation: "/soˈbɾiɲɐ/" }
+        ],
+        viagem: [
+            { front: "Airport", back: "Aeroporto", pronunciation: "/ɐ.e.ɾoˈpoɾ.tu/" },
+            { front: "Passport", back: "Passaporte", pronunciation: "/pɐ.sɐˈpoɾ.tʃi/" },
+            { front: "Ticket", back: "Bilhete", pronunciation: "/biˈʎe.tʃi/" },
+            { front: "Hotel", back: "Hotel", pronunciation: "/oˈtɛw/" },
+            { front: "Suitcase", back: "Mala", pronunciation: "/ˈma.lɐ/" },
+            { front: "Map", back: "Mapa", pronunciation: "/ˈma.pɐ/" },
+            { front: "Taxi", back: "Táxi", pronunciation: "/ˈta.ksi/" },
+            { front: "Beach", back: "Praia", pronunciation: "/ˈpɾaj.ɐ/" },
+            { front: "Mountain", back: "Montanha", pronunciation: "/mõˈtɐ.ɲɐ/" },
+            { front: "Tourist", back: "Turista", pronunciation: "/tuˈɾis.tɐ/" },
+            { front: "Flight", back: "Voo", pronunciation: "/voˈu/" },
+            { front: "Luggage", back: "Bagagem", pronunciation: "/bɐˈɡa.ʒẽj/" },
+            { front: "Destination", back: "Destino", pronunciation: "/dʒisˈtʃi.nu/" }
+        ]
+    };
+
+    let currentCategory = categories.saudacoes;
+    let currentFlashcard = 0;
+    let isFlipped = false;
+    let currentAudio = null;
+    let correctCount = 0;
+    let incorrectCount = 0;
+
+    function flipFlashcard() {
+        const flashcard = document.getElementById('flashcard');
+        if (isFlipped) {
+            flashcard.style.transform = "rotateY(0deg)";
+        } else {
+            flashcard.style.transform = "rotateY(180deg)";
+        }
+        isFlipped = !isFlipped;
+    }
+
+    function playAudio() {
+        const audioPath = currentCategory[currentFlashcard].audio;
+        if (audioPath) {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+            currentAudio = new Audio(audioPath);
+            currentAudio.play();
+        }
+    }
+
+    document.getElementById('play-audio-btn').addEventListener('click', function(event) {
+        event.stopPropagation();
+        playAudio();
+    });
+
+    function nextFlashcard() {
+        const flashcard = document.getElementById('flashcard');
+        if (currentAudio) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+        }
+        flashcard.style.transform = "rotateY(0deg)";
+        isFlipped = false;
+        setTimeout(() => {
+            currentFlashcard = (currentFlashcard + 1) % currentCategory.length;
+            document.getElementById('flashcard-content').textContent = currentCategory[currentFlashcard].front;
+            document.getElementById('flashcard-back-content').textContent = currentCategory[currentFlashcard].back;
+            document.getElementById('pronunciation-text').textContent = currentCategory[currentFlashcard].pronunciation;
+        }, 300);
+    }
+
+    function markCorrect() {
+        correctCount++;
+        document.getElementById('correct-count').textContent = correctCount;
+    }
+
+    function markIncorrect() {
+        incorrectCount++;
+        document.getElementById('incorrect-count').textContent = incorrectCount;
+    }
+
+    function changeCategory() {
+        const selectedCategory = document.getElementById('category-select').value;
+        currentCategory = categories[selectedCategory];
+        currentFlashcard = 0;
+        document.getElementById('flashcard-content').textContent = currentCategory[currentFlashcard].front;
+        document.getElementById('flashcard-back-content').textContent = currentCategory[currentFlashcard].back;
+        document.getElementById('pronunciation-text').textContent = currentCategory[currentFlashcard].pronunciation;
+        document.getElementById('flashcard').style.transform = "rotateY(0deg)";
+        isFlipped = false;
+    }
+</script>
+
+{% endblock %}

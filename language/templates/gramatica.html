@@ -1,0 +1,248 @@
+{% extends 'base.html' %}
+
+{% block title %}Praticar - Gramática{% endblock %}
+
+{% block body_class %}bg-custom-gramatica{% endblock %}
+
+{% block content %}
+<style>
+  
+  select:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+  }
+
+  option:disabled {
+      color: #999;
+  }
+</style>
+<div class="container mt-4">
+  <div class="row">
+    <!-- Jogo (lado esquerdo) -->
+    <div class="col-md-8 d-flex flex-column">
+      <!-- Título e subtítulo no canto superior esquerdo -->
+      <div class="text-left mb-4">
+        <h1>Conjugação de Verbos</h1>
+        <p class="lead">Pratique português com nossos exercícios interativos!</p>
+      </div>
+
+      <!-- Substitua esta seção -->
+    <div class="d-flex justify-content-start mb-4">
+      <select id="category-select" onchange="changeCategory()" class="form-select w-25 me-3">
+        <option value="verbos-regulares">Verbos Regulares</option>
+        <option value="verbos-irregulares">Verbos Irregulares</option>
+        <option value="verbos-de-acao">Verbos de Ação</option>
+        <option value="verbos-de-estado">Verbos de Estado</option>
+      </select>
+      
+      <!-- Novo select para tempo verbal -->
+      <select id="tense-select" class="form-select w-25 me-3" disabled>
+        <option value="presente" selected>Presente</option>
+        <option value="pretérito" disabled>Pretérito</option>
+        <option value="futuro" disabled>Futuro</option>
+        <option value="subjuntivo" disabled>Subjuntivo</option>
+        <option value="imperativo" disabled>Imperativo</option>
+      </select>
+      
+      <button id="start-button" class="btn btn-success" style="color: ghostwhite;">Iniciar</button>
+    </div>
+
+      <!-- Container do exercício -->
+      <div id="exercise-container" style="display: none;" class="flex-grow-1">
+        <div class="card h-100">
+          <div class="card-body d-flex flex-column">
+            <!-- Instruções -->
+            <div class="alert alert-info mb-3">
+              <strong>Instruções:</strong> Preencha a lacuna com a conjugação correta do verbo no tempo <strong>presente</strong>.
+            </div>
+
+            <!-- Frase a ser completada -->
+            <h5 id="sentence-to-complete" class="mb-3"></h5>
+
+            <!-- Campo de resposta -->
+            <input id="answer-input" type="text" class="form-control mb-3" placeholder="Digite a conjugação correta">
+
+            <!-- Botão de verificação -->
+            <button id="check-answer-button" class="btn btn-success mb-3">Verificar Resposta</button>
+
+            <!-- Resultado -->
+            <p id="result" class="mb-0"></p>
+          </div>
+        </div>
+
+        <!-- Botão para próxima palavra -->
+        <button id="next-verb-button" class="btn btn-secondary mt-3" style="display: none;">Próxima Palavra</button>
+      </div>
+    </div>
+
+    <!-- Painel de Progresso e Dicas (lado direito) -->
+    <div class="col-md-4 d-flex flex-column">
+      <!-- Painel de Progresso -->
+      <div class="card mb-4 h-100">
+        <div class="card-body d-flex flex-column">
+          <h5>Seu Progresso</h5>
+          <p>Respostas corretas: <span id="correct-answers">0</span></p>
+          <p>Respostas incorretas: <span id="incorrect-answers">0</span></p>
+          <p>Acertos: <span id="accuracy">0%</span></p>
+        </div>
+      </div>
+
+      <!-- Dicas Extras -->
+      <div class="card h-100">
+        <div class="card-body d-flex flex-column">
+          <h5>Dicas de Conjugação</h5>
+          <p><strong>Verbos Regulares:</strong> Seguem um padrão fixo. Exemplo: "Eu falo", "Você fala".</p>
+          <p><strong>Verbos Irregulares:</strong> Têm conjugações únicas. Exemplo: "Eu vou", "Você faz".</p>
+          <p><strong>Verbos de Ação:</strong> Descrevem atividades. Exemplo: "Eu corro", "Você estuda".</p>
+          <p><strong>Verbos de Estado:</strong> Descrevem condições. Exemplo: "Eu sou", "Você está".</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const startButton = document.getElementById('start-button');
+  const exerciseContainer = document.getElementById('exercise-container');
+  const sentenceToComplete = document.getElementById('sentence-to-complete');
+  const answerInput = document.getElementById('answer-input');
+  const checkAnswerButton = document.getElementById('check-answer-button');
+  const nextVerbButton = document.getElementById('next-verb-button');
+  const result = document.getElementById('result');
+  const correctAnswersSpan = document.getElementById('correct-answers');
+  const incorrectAnswersSpan = document.getElementById('incorrect-answers');
+  const accuracySpan = document.getElementById('accuracy');
+
+  let currentSentence = null;
+  let currentCategory = 'verbos-regulares';
+  let correctAnswers = 0;
+  let incorrectAnswers = 0;
+
+  // Lista de frases com mais palavras para cada categoria
+  const sentences = {
+    'verbos-regulares': [
+      { sentence: 'Eu ________ (falar) com meus amigos.', answer: 'falo' },
+      { sentence: 'Você ________ (estudar) muito para a prova.', answer: 'estuda' },
+      { sentence: 'Nós ________ (trabalhar) juntos no projeto.', answer: 'trabalhamos' },
+      { sentence: 'Eles ________ (cantar) muito bem.', answer: 'cantam' },
+      { sentence: 'Eu ________ (comer) uma maçã.', answer: 'como' },
+      { sentence: 'Você ________ (beber) água todos os dias.', answer: 'bebe' },
+      { sentence: 'Nós ________ (viver) em uma cidade grande.', answer: 'vivemos' },
+      { sentence: 'Eles ________ (escrever) cartas.', answer: 'escrevem' },
+      { sentence: 'Eu ________ (ler) um livro interessante.', answer: 'leio' },
+      { sentence: 'Você ________ (abrir) a janela, por favor?', answer: 'abre' }
+    ],
+    'verbos-irregulares': [
+      { sentence: 'Eu ________ (ir) ao mercado.', answer: 'vou' },
+      { sentence: 'Você ________ (fazer) o dever de casa.', answer: 'faz' },
+      { sentence: 'Nós ________ (ter) uma reunião importante.', answer: 'temos' },
+      { sentence: 'Eles ________ (ser) muito simpáticos.', answer: 'são' },
+      { sentence: 'Eu ________ (estar) cansado hoje.', answer: 'estou' },
+      { sentence: 'Você ________ (vir) à festa amanhã?', answer: 'vem' },
+      { sentence: 'Nós ________ (poder) ajudar você.', answer: 'podemos' },
+      { sentence: 'Eles ________ (querer) viajar no fim de semana.', answer: 'querem' },
+      { sentence: 'Eu ________ (saber) a resposta.', answer: 'sei' },
+      { sentence: 'Você ________ (ver) o filme novo?', answer: 'vê' }
+    ],
+    'verbos-de-acao': [
+      { sentence: 'Eu ________ (correr) no parque.', answer: 'corro' },
+      { sentence: 'Você ________ (nadar) na piscina.', answer: 'nada' },
+      { sentence: 'Nós ________ (jogar) futebol.', answer: 'jogamos' },
+      { sentence: 'Eles ________ (dançar) na festa.', answer: 'dançam' },
+      { sentence: 'Eu ________ (pular) corda.', answer: 'pulo' },
+      { sentence: 'Você ________ (andar) de bicicleta.', answer: 'anda' },
+      { sentence: 'Nós ________ (escalar) montanhas.', answer: 'escalamos' },
+      { sentence: 'Eles ________ (brincar) no jardim.', answer: 'brincam' },
+      { sentence: 'Eu ________ (pintar) um quadro.', answer: 'pinto' },
+      { sentence: 'Você ________ (cozinhar) o jantar.', answer: 'cozinha' }
+    ],
+    'verbos-de-estado': [
+      { sentence: 'Eu ________ (ser) feliz.', answer: 'sou' },
+      { sentence: 'Você ________ (estar) cansado.', answer: 'está' },
+      { sentence: 'Nós ________ (ter) fome.', answer: 'temos' },
+      { sentence: 'Eles ________ (parecer) preocupados.', answer: 'parecem' },
+      { sentence: 'Eu ________ (ficar) em casa hoje.', answer: 'fico' },
+      { sentence: 'Você ________ (sentir) frio?', answer: 'sente' },
+      { sentence: 'Nós ________ (permanecer) calmos.', answer: 'permanecemos' },
+      { sentence: 'Eles ________ (tornar-se) amigos.', answer: 'tornam-se' },
+      { sentence: 'Eu ________ (encontrar) a solução.', answer: 'encontro' },
+      { sentence: 'Você ________ (continuar) estudando.', answer: 'continua' }
+    ]
+  };
+
+  startButton.addEventListener('click', () => {
+    exerciseContainer.style.display = 'block';
+    startButton.style.display = 'none';
+    startExercise();
+  });
+
+  checkAnswerButton.addEventListener('click', () => {
+    checkAnswer();
+  });
+
+  nextVerbButton.addEventListener('click', () => {
+    startExercise();
+  });
+
+  let lastSentence = null; // Armazena a última sentença exibida
+
+  function startExercise() {
+    let availableSentences = sentences[currentCategory].filter(s => s.sentence !== lastSentence);
+
+    // Se todas as frases já foram usadas, reseta a lista
+    if (availableSentences.length === 0) {
+      availableSentences = sentences[currentCategory];
+    }
+
+    currentSentence = availableSentences[Math.floor(Math.random() * availableSentences.length)];
+    lastSentence = currentSentence.sentence; // Atualiza a última sentença usada
+
+    sentenceToComplete.textContent = currentSentence.sentence;
+    answerInput.value = '';
+    result.textContent = '';
+    nextVerbButton.style.display = 'none';
+  }
+
+  function checkAnswer() {
+    const answer = answerInput.value.trim();
+    if (answer === '') {
+      result.textContent = 'Por favor, insira uma resposta.';
+      return;
+    }
+    if (answer.toLowerCase() === currentSentence.answer.toLowerCase()) {
+      result.innerHTML = '<i class="bi bi-check-circle-fill text-success"></i> Resposta correta!';
+      result.className = 'text-success';
+      correctAnswers++;
+    } else {
+      result.innerHTML = '<i class="bi bi-x-circle-fill text-danger"></i> Resposta incorreta. Tente novamente!';
+      result.className = 'text-danger';
+      incorrectAnswers++;
+    }
+
+    // Atualiza o painel de progresso
+    correctAnswersSpan.textContent = correctAnswers;
+    incorrectAnswersSpan.textContent = incorrectAnswers;
+    const totalAnswers = correctAnswers + incorrectAnswers;
+    const accuracy = totalAnswers > 0 ? Math.round((correctAnswers / totalAnswers) * 100) : 0;
+    accuracySpan.textContent = `${accuracy}%`;
+
+    nextVerbButton.style.display = 'block';
+  }
+
+  function changeCategory() {
+    currentCategory = document.getElementById('category-select').value;
+    startExercise();
+  }
+
+  answerInput.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      event.preventDefault(); // Evita que o formulário seja enviado (caso esteja dentro de um form)
+      if (nextVerbButton.style.display === 'block') {
+        nextVerbButton.click(); // Se o botão de próxima palavra estiver visível, clique nele
+      } else {
+        checkAnswerButton.click(); // Se não, clique no botão de verificar resposta
+      }
+    }
+  });
+</script>
+{% endblock %}

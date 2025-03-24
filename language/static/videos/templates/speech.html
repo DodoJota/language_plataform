@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+
+{% block title %}Praticar - Hangman{% endblock %}
+
+{% block content %}
+<div class="container mt-5 d-flex flex-column align-items-center">
+  <h1>Hangman</h1>
+  <p>Pratique a pronúncia de palavras em português com o nosso jogo de Hangman.</p>
+
+  <div id="hangman">
+    <p id="palavra">_ _ _ _ _ _</p>
+    <input id="input-letra" type="text" placeholder="Digite uma letra">
+    <button id="botao-verificar">Verificar</button>
+    <button id="botao-reset">Resetar</button>
+    <button id="botao-proxima-palavra">Próxima Palavra</button>
+    <div id="resultado"></div>
+    <div id="rosto">
+      <svg width="200" height="200">
+        <!-- Círculo do rosto -->
+        <circle cx="100" cy="100" r="50" fill="none" stroke="black" stroke-width="3" />
+        <!-- Olho esquerdo -->
+        <circle id="olho-esquerdo" cx="80" cy="90" r="5" fill="black" style="display: none;" />
+        <!-- Olho direito -->
+        <circle id="olho-direito" cx="120" cy="90" r="5" fill="black" style="display: none;" />
+        <!-- Nariz -->
+        <circle id="nariz" cx="100" cy="110" r="3" fill="black" style="display: none;" />
+        <!-- Orelha esquerda -->
+        <circle id="orelha-esquerda" cx="40" cy="100" r="10" fill="none" stroke="black" stroke-width="3" style="display: none;" />
+        <!-- Orelha direita -->
+        <circle id="orelha-direita" cx="160" cy="100" r="10" fill="none" stroke="black" stroke-width="3" style="display: none;" />
+        <!-- Boca triste -->
+        <path id="boca-triste" d="M80 130 Q100 110 120 130" stroke="black" stroke-width="3" fill="none" style="display: none;" />
+        <!-- Boca feliz -->
+        <path id="boca-feliz" d="M80 130 Q100 150 120 130" stroke="black" stroke-width="3" fill="none" style="display: none;" />
+      </svg>
+    </div>
+  </div>
+</div>
+
+<style>
+  #hangman {
+    width: 500px;
+    height: 500px;
+    border: 2px solid #ccc;
+    padding: 20px;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+
+  #palavra {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+  }
+
+  #input-letra {
+    width: 50px;
+    height: 30px;
+    padding: 10px;
+    font-size: 18px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+
+  #botao-verificar, #botao-reset, #botao-proxima-palavra {
+    width: 150px;
+    height: 40px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin: 5px;
+  }
+
+  #botao-verificar:hover, #botao-reset:hover, #botao-proxima-palavra:hover {
+    background-color: #45a049;
+  }
+
+  #resultado {
+    font-size: 18px;
+    color: #666;
+    margin-top: 20px;
+  }
+
+  #rosto {
+    margin-top: 20px;
+  }
+</style>
+
+<script>
+  const palavra = document.getElementById('palavra');
+  const inputLetra = document.getElementById('input-letra');
+  const botaoVerificar = document.getElementById('botao-verificar');
+  const botaoReset = document.getElementById('botao-reset');
+  const botaoProximaPalavra = document.getElementById('botao-proxima-palavra');
+  const resultado = document.getElementById('resultado');
+
+  // Elementos do rosto
+  const olhoEsquerdo = document.getElementById('olho-esquerdo');
+  const olhoDireito = document.getElementById('olho-direito');
+  const nariz = document.getElementById('nariz');
+  const orelhaEsquerda = document.getElementById('orelha-esquerda');
+  const orelhaDireita = document.getElementById('orelha-direita');
+  const bocaTriste = document.getElementById('boca-triste');
+  const bocaFeliz = document.getElementById('boca-feliz');
+
+  // Lista de palavras
+  const palavras = ['COMPUTADOR', 'ELEFANTE', 'GIRASSOL', 'LARANJA', 'MONTANHA', 'PASSARO', 'VIOLINO', 'ZEBRA'];
+  let palavraSecreta = '';
+  let letrasAcertadas = [];
+  let letrasErradas = [];
+
+  // Função para escolher uma palavra aleatória
+  function escolherPalavra() {
+    palavraSecreta = palavras[Math.floor(Math.random() * palavras.length)];
+    letrasAcertadas = [];
+    letrasErradas = [];
+    palavra.textContent = palavraSecreta.split('').map(() => '_').join(' ');
+    resultado.textContent = '';
+    inputLetra.value = '';
+    resetarRosto();
+  }
+
+  // Função para resetar o rosto
+  function resetarRosto() {
+    olhoEsquerdo.style.display = 'none';
+    olhoDireito.style.display = 'none';
+    nariz.style.display = 'none';
+    orelhaEsquerda.style.display = 'none';
+    orelhaDireita.style.display = 'none';
+    bocaTriste.style.display = 'none';
+    bocaFeliz.style.display = 'none';
+  }
+
+  // Função para mostrar a carinha completa (vitória)
+  function mostrarCarinhaFeliz() {
+    olhoEsquerdo.style.display = 'block';
+    olhoDireito.style.display = 'block';
+    nariz.style.display = 'block';
+    orelhaEsquerda.style.display = 'block';
+    orelhaDireita.style.display = 'block';
+    bocaFeliz.style.display = 'block';
+    bocaTriste.style.display = 'none';
+  }
+
+  // Inicializa o jogo com uma palavra
+  escolherPalavra();
+
+  botaoVerificar.addEventListener('click', () => {
+    const letraDigitada = inputLetra.value.toUpperCase();
+    if (letraDigitada.length !== 1) {
+      resultado.textContent = 'Por favor, digite apenas uma letra.';
+      return;
+    }
+
+    if (palavraSecreta.includes(letraDigitada)) {
+      const indices = [];
+      for (let i = 0; i < palavraSecreta.length; i++) {
+        if (palavraSecreta[i] === letraDigitada) {
+          indices.push(i);
+        }
+      }
+
+      for (const indice of indices) {
+        letrasAcertadas.push(indice);
+      }
+
+      palavra.textContent = palavraSecreta.split('').map((letra, indice) => {
+        if (letrasAcertadas.includes(indice)) {
+          return letra;
+        } else {
+          return '_';
+        }
+      }).join(' ');
+
+      if (letrasAcertadas.length === palavraSecreta.length) {
+        resultado.textContent = 'Parabéns! Você acertou a palavra!';
+        mostrarCarinhaFeliz();
+      }
+    } else {
+      letrasErradas.push(letraDigitada);
+      resultado.textContent = `Desculpe, você errou a letra. Você tem ${6 - letrasErradas.length} chances restantes.`;
+
+      // Atualiza o desenho do rosto com base no número de erros
+      switch (letrasErradas.length) {
+        case 1:
+          olhoEsquerdo.style.display = 'block';
+          break;
+        case 2:
+          olhoDireito.style.display = 'block';
+          break;
+        case 3:
+          nariz.style.display = 'block';
+          break;
+        case 4:
+          orelhaEsquerda.style.display = 'block';
+          break;
+        case 5:
+          orelhaDireita.style.display = 'block';
+          break;
+        case 6:
+          bocaTriste.style.display = 'block';
+          resultado.textContent = `Que pena! A palavra secreta era ${palavraSecreta}.`;
+          break;
+      }
+
+      if (letrasErradas.length === 6) {
+        resultado.textContent = `Que pena! A palavra secreta era ${palavraSecreta}.`;
+      }
+    }
+
+    inputLetra.value = '';
+  });
+
+  // Botão de reset
+  botaoReset.addEventListener('click', () => {
+    escolherPalavra();
+  });
+
+  // Botão de próxima palavra
+  botaoProximaPalavra.addEventListener('click', () => {
+    escolherPalavra();
+  });
+</script>
+{% endblock %}

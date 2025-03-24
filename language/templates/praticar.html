@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}Praticar - Jogos{% endblock %}
+
+{% block content %}
+{% load static %}
+<div class="container mt-5">
+  <div class="row mb-4">
+    <div class="col-md-12">
+        <div id="carouselExampleCaptions" class="carousel slide rounded" data-bs-ride="carousel" style="height: 23vh; overflow: hidden;">
+        
+            <div class="carousel-inner h-100">
+                <!-- Slide 1 -->
+                <div class="carousel-item active h-100">
+                    <img src="{% static 'images/green3.jpg' %}" class="d-block w-100 h-100" alt="Slide 1" style="object-fit: cover;">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h1>Divirta-se e teste os seus conhecimentos!</h1>
+                    </div>
+                </div>
+                <!-- Slide 2 -->
+            </div>
+        </div>
+    </div>
+  </div>
+  <div class="row">
+    <!-- Card de Flashcards -->
+    <div class="col-md-4">
+      <div class="card">
+        {% load static %}
+        <img src="{% static 'images/flashcards.jpg' %}" class="card-img-top" alt="Flashcards">
+        <div class="card-body card-com-fundo">
+          <h5 class="card-title" style="color: rgb(254, 255, 255);">Flashcards</h5>
+          <p class="card-text" style="color: rgb(254, 255, 255);">Pratique vocabulário com flashcards interativos.</p>
+          <a href="{% url 'flashcards' %}" class="btn btn-light">Praticar</a>
+        </div>
+      </div>
+    </div>
+    <!-- Card de Speech -->
+    <div class="col-md-4">
+      <div class="card">
+        {% load static %}
+        <img src="{% static 'images/2faces.jpg' %}" class="card-img-top" alt="Faces">
+        <div class="card-body card-com-fundo">
+          <h5 class="card-title" style="color: rgb(254, 255, 255);">Triste ou Feliz?</h5>
+          <p class="card-text" style="color: rgb(254, 255, 255);">Descubra a palavra e faça o boneco feliz!</p>
+          <a href="{% url 'faces' %}" class="btn btn-light">Praticar</a>
+        </div>
+      </div>
+    </div>
+    <!-- Card de Gramática -->
+    <div class="col-md-4">
+      <div class="card">
+        {% load static %}
+        <img src="{% static 'images/gramatica.jpg' %}" class="card-img-top" alt="gramatica">
+        <div class="card-body card-com-fundo">
+          <h5 class="card-title" style="color: rgb(254, 255, 255);">Verbos</h5>
+          <p class="card-text" style="color: rgb(254, 255, 255);">Pratique a conjugação dos principais verbos.</p>
+          <a href="{% url 'gramatica' %}" class="btn btn-light">Praticar</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

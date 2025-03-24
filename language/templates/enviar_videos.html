@@ -1,0 +1,77 @@
+{% extends 'teacher.html' %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="row">
+        <!-- Sidebar (lado esquerdo) -->
+        <div class="col-auto">
+            <!-- O sidebar herdado de base.html já está aqui -->
+        </div>
+
+        <!-- Conteúdo principal (lado direito) -->
+        <div class="col">
+            <h1 class="display-4">Disponibilize seus vídeos!</h1>
+            <div class="row">
+                <!-- Formulário de Upload de Vídeos -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data" action="{% url 'enviar_videos' %}">
+                                {% csrf_token %}
+                                <div class="mb-3">
+                                    <label for="titulo" class="form-label">Título do Vídeo</label>
+                                    <input type="text" class="form-control" id="titulo" name="titulo" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="modulo" class="form-label">Módulo (digite apenas o número)</label>
+                                    <input type="text" class="form-control" id="modulo" name="modulo" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="ordem" class="form-label">Ordem da Aula (digite apenas o número)</label>
+                                    <input type="number" class="form-control" id="ordem" name="ordem" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="video" class="form-label">Selecione o Vídeo</label>
+                                    <input type="file" class="form-control" id="video" name="video" accept="video/*" required>
+                                </div>
+                                <button type="submit" class="btn btn-dark">Enviar Vídeo</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Vídeos Enviados -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h4 class="card-title">Vídeos Enviados</h4>
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Módulo</th>
+                                        <th>Ordem</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for video in videos %}
+                                    <tr>
+                                        <td>{{ video.titulo }}</td>
+                                        <td>{{ video.modulo }}</td>
+                                        <td>{{ video.ordem }}</td>
+                                        <td>
+                                            <a href="{% url 'deletar_video' video.id %}" class="btn btn-sm btn-danger">Deletar</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

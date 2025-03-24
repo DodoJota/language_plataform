@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA0mFf3vITZFCtdj34zlj3XW8nU6MZZoUcR1Bq1qQ9xWhcBupzP8dfHUepBa7h" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@coreui/icons/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@coreui/coreui/dist/css/coreui.min.css">
+    <title>{% block title %}Base{% endblock %}</title>
+    <style>
+        /* Estilo para o carregamento */
+        .loader-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgb(255, 255, 255);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            height: 100vh;
+        }
+        .loader-wrapper .loader {
+            font-size: 50px;
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Personalização do corpo da página */
+        body {
+            display: flex;
+            margin: 0;
+        }
+        .sidebar {
+            width: 60px;
+            transition: width 0.3s;
+            background-color: #023805ec;
+        }
+        .sidebar:hover {
+            width: 200px;
+        }
+        .main-content {
+            flex-grow: 1;
+            transition: margin-left 0.3s;
+            padding: 20px;
+        }
+        .sidebar:hover + .main-content {
+            margin-left: 250px;
+        }
+
+        /* Estilos para telas pequenas */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 200px;
+                position: fixed;
+                background-color: #000000;
+                left: -250px;
+                transition: left 0.3s;
+                z-index: 1000;
+                height: 100vh;
+                overflow-y: auto;
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-custom-portugues">
+    <!-- Carregamento -->
+    <div class="loader-wrapper" id="loader">
+        <i class="cib-django loader"><span>beta</span></i>   
+    </div>
+
+    <!-- Botão de toggle para a sidebar -->
+    <button class="btn btn-dark d-md-none" id="sidebarToggle" style="position: fixed; top: 10px; left: 10px; z-index: 1001;">
+        <i class="cil-menu"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar sidebar-narrow-unfoldable sidebar-dark border-end">
+        <div class="sidebar-header border-bottom">
+            <div class="sidebar-brand">
+                <i class="cib-django" href="https://www.linkedin.com/in/dorian-sampaio-j-34a6001bb/" target="_blank"></i>
+                <span>beta</span>
+            </div>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="nav-title">CURSO</li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'portugues' %}"><i class="nav-icon cil-home"></i> INÍCIO</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'aulas' %}"><i class="nav-icon cil-education"></i> CURSO</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'materiais' %}"><i class="nav-icon cil-folder"></i> MATERIAIS</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'praticar' %}"><i class="nav-icon cil-casino"></i> PRATICAR</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'dicionario' %}"><i class="nav-icon cil-book"></i> DICIONÁRIO <span class="badge bg-warning">Breve</span></a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="nav-icon cil-chat-bubble"></i> FORÚM <span class="badge bg-warning">Breve</span></a></li>
+            <li class="nav-item mt-auto"><a class="nav-link" href="{% url 'contato' %}"><i class="nav-icon cil-info"></i> AJUDA</a></li>
+            <li class="nav-item">
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-link" style="border: none; background: none;">
+                        <i class="nav-icon cil-account-logout"></i> LOGOUT
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="main-content">
+        {% block content %}
+        <!-- Conteúdo principal aqui -->
+        {% endblock %}
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script>
+        setTimeout(function() {
+            document.getElementById('loader').style.display = 'none';
+        }, 800);
+
+        // Toggle da sidebar em telas pequenas
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButton = document.getElementById('sidebarToggle');
+            const sidebar = document.querySelector('.sidebar');
+
+            if (toggleButton && sidebar) {
+                toggleButton.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                });
+            } else {
+                console.error('Elementos não encontrados: sidebarToggle ou .sidebar');
+            }
+        });
+    </script>
+</body>
+</html>

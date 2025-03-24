@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA0mFf3vITZFCtdj34zlj3XW8nU6MZZoUcR1Bq1qQ9xWhcBupzP8dfHUepBa7h" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@coreui/icons/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@coreui/coreui/dist/css/coreui.min.css">
+    <title>{% block title %}Dashboard do Professor{% endblock %}</title>
+    <style>
+        /* Estilo para o carregamento */
+        .loader-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgb(255, 255, 255);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            height: 100vh;
+        }
+        .loader-wrapper .loader {
+            font-size: 50px;
+            animation: spin 1s infinite linear;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Personalização do corpo da página */
+        body {
+            display: flex;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+        .sidebar {
+            width: 60px;
+            height: 100vh;
+            background-color: #000000;
+            color: #fff;
+            transition: width 0.3s;
+            position: fixed;
+            z-index: 1000;
+            overflow-x: hidden;
+        }
+        .sidebar:hover {
+            width: 200px;
+        }
+        .main-content {
+            margin-left: 60px;
+            flex-grow: 1;
+            padding: 20px;
+            transition: margin-left 0.3s;
+        }
+        .sidebar:hover + .main-content {
+            margin-left: 250px;
+        }
+
+        /* Estilos para telas pequenas */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 250px;
+                position: fixed;
+                left: -250px;
+                transition: left 0.3s;
+                z-index: 1000;
+                height: 100vh;
+                overflow-y: auto;
+            }
+            .sidebar.active {
+                left: 0;
+            }
+            .main-content {
+                margin-left: 0;
+            }
+        }
+
+        /* Estilos para o conteúdo */
+        .dashboard-header {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .dashboard-header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .dashboard-card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .dashboard-card h2 {
+            margin-top: 0;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .calendar-embed {
+            height: 300px; /* Altura reduzida para ficar mais retangular */
+            border: none;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .notes-box {
+            background-color: #fff3cd; /* Cor de fundo estilo post-it */
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            height: 300px; /* Altura igual ao calendário */
+        }
+        .notes-box textarea {
+            width: 100%;
+            height: 200px;
+            border: none;
+            background-color: transparent;
+            resize: none; /* Impede o redimensionamento */
+        }
+        .notes-box button {
+            margin-top: 10px;
+        }
+        /* Adicione ao seu <style> existente */
+        .metric-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(13, 110, 253, 0.2);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-com-fundo-aulas {
+            background: linear-gradient(135deg, rgba(89, 253, 13, 0.05) 0%, rgba(255, 255, 255, 1) 100%);
+            border-left: 2px solid #01671b;
+        }
+
+        .dashboard-card {
+            transition: all 0.3s ease;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(89, 253, 13, 0.05) 0%, rgba(255, 255, 255, 1) 100%);
+            border-left: 2px solid #01671b;
+        }
+
+        .dashboard-card:hover {
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<body class="bg-custom-portugues">
+    <!-- Carregamento -->
+    <div class="loader-wrapper" id="loader">
+        <i class="cib-django loader" href="https://www.linkedin.com/in/dorian-sampaio-j-34a6001bb/" target="_blank"><span>beta</span></i>   
+    </div>
+
+    <!-- Botão de toggle para a sidebar -->
+    <button class="btn btn-dark d-md-none" id="sidebarToggle" style="position: fixed; top: 10px; left: 10px; z-index: 1001;">
+        <i class="cil-menu"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar sidebar-narrow-unfoldable sidebar-dark border-end">
+        <div class="sidebar-header border-bottom">
+            <div class="sidebar-brand">
+                <i class="cib-django"></i>
+                <span>beta</span>
+            </div>
+        </div>
+        <ul class="sidebar-nav">
+            <li class="nav-title">CURSO</li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'teacher' %}"><i class="nav-icon cil-home"></i> INÍCIO</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'enviar_videos' %}"><i class="nav-icon cil-education"></i> AULAS</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'enviar_materiais' %}"><i class="nav-icon cil-folder"></i> MATERIAIS</a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="nav-icon cil-equalizer"></i> ESTÚDIO <span class="badge bg-warning btn-sm">Breve</span></a></li>
+            <li class="nav-item"><a class="nav-link" href="#"><i class="nav-icon cil-video"></i> LIVE <span class="badge bg-warning btn-sm">Breve</span></a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'portugues' %}"><i class="nav-icon cil-zoom-in"></i> Estudante</a></li>
+            <li class="nav-item mt-auto"><a class="nav-link" href="{% url 'contato' %}"><i class="nav-icon cil-info"></i> AJUDA</a></li>
+            <li class="nav-item">
+                <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-link" style="border: none; background: none;">
+                        <i class="nav-icon cil-account-logout"></i> LOGOUT
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Conteúdo principal -->
+    <div class="main-content">
+        {% block content %}
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div id="carouselExampleCaptions" class="carousel slide rounded" data-bs-ride="carousel" style="height: 23vh; overflow: hidden;">
+                    <div class="carousel-indicators">
+                        <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                        <button type="button" data-bs-target="#carouselExampleCaptions" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                    </div>
+                    <div class="carousel-inner h-100">
+                        <!-- Slide 1 -->
+                        <div class="carousel-item active h-100">
+                            <img src="{% static 'images/green3.jpg' %}" class="d-block w-100 h-100" alt="Slide 1" style="object-fit: cover;">
+                            <div class="carousel-caption d-none d-md-block">
+                                <h1>Olá, seja bem-vindo!</h1>
+                            </div>
+                        </div>
+                        <!-- Slide 2 -->
+                        <div class="carousel-item h-100">
+                            <img src="{% static 'images/green3.jpg' %}" class="d-block w-100 h-100" alt="Slide 2" style="object-fit: cover;">
+                            <div class="carousel-caption d-none d-md-block">
+                                <h2>Este é o dashboard que o ajudará em sua organização diária!</h2>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+        <!-- Seção de Aulas e Materiais (lado a lado) -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="dashboard-card card-com-fundo-aulas">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="mb-0">
+                            <i class="cil-education me-2"></i> Aulas
+                        </h2>
+                        <span class="badge bg-primary rounded-pill">{{ total_aulas|default:"0" }} itens</span>
+                    </div>
+                    
+                    <!-- Card idêntico ao de Materiais, mas com ícone de aula -->
+                    <div class="row">
+                        <div class="col-md-12">  <!-- Única coluna ocupando toda a largura -->
+                            <div class="metric-card bg-primary bg-opacity-10 p-3 rounded mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="cil-video text-primary me-2 fs-4"></i>
+                                    <div>
+                                        <h5 class="mb-0">{{ total_aulas|default:"0" }}</h5>
+                                        <small class="text-muted">Total de aulas</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid mt-2" style="width: 30%;">
+                        <a href="{% url 'enviar_videos' %}" class="btn btn-dark">
+                            <i class="cil-cloud-upload me-2"></i> Gerenciar Aulas
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+
+            <!-- Seção de Materiais (direita) -->
+            <div class="col-md-6">
+                <div class="dashboard-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="mb-0">
+                            <i class="cil-folder me-2"></i> Materiais
+                        </h2>
+                        <span class="badge bg-info rounded-pill">{{ total_materiais }} itens</span>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="metric-card bg-primary bg-opacity-10 p-3 rounded mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="cil-file text-primary me-2 fs-4"></i>
+                                    <div>
+                                        <h5 class="mb-0">{{ materiais_pdf }}</h5>
+                                        <small class="text-muted">PDFs</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="metric-card bg-secondary bg-opacity-10 p-3 rounded mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="cil-description text-secondary me-2 fs-4"></i>
+                                    <div>
+                                        <h5 class="mb-0">{{ materiais_outros }}</h5>
+                                        <small class="text-muted">Outros</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid mt-2" style="width: 30%;">
+                        <a href="{% url 'enviar_materiais' %}" class="btn btn-dark">
+                            <i class="cil-cloud-upload me-2"></i> Gerenciar Materiais
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Calendário e Notas (lado a lado) -->
+        <div class="row mt-3 pt-1">
+            <!-- Calendário (esquerda) -->
+            <div class="col-md-6">
+                <div class="dashboard-card">
+                    <h2>Calendário</h2>
+                    <iframe src="https://calendar.google.com/calendar/embed?src=b525f87c74a9701dccdf27cfc5cbcad2dc7c894119d73d2ef33390db0ed834c1%40group.calendar.google.com&ctz=Europe%2FLisbon" class="calendar-embed" style="width:100%;" frameborder="0" scrolling="no"></iframe>
+                </div>
+            </div>
+
+            <!-- Box de Notas (direita) -->
+            <div class="col-md-6">
+                <div class="notes-box">
+                    <h2>Notas</h2>
+                    <textarea placeholder="Escreva suas notas aqui..."></textarea>
+                    <button class="btn btn-warning">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
+    <script>
+        setTimeout(function() {
+            document.getElementById('loader').style.display = 'none';
+        }, 800);
+
+        // Toggle da sidebar em telas pequenas
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleButton = document.getElementById('sidebarToggle');
+            const sidebar = document.querySelector('.sidebar');
+
+            if (toggleButton && sidebar) {
+                toggleButton.addEventListener('click', function() {
+                    sidebar.classList.toggle('active');
+                });
+            } else {
+                console.error('Elementos não encontrados: sidebarToggle ou .sidebar');
+            }
+        });
+        // Função para salvar as notas
+        // Elementos da página
+        const notesTextarea = document.querySelector('.notes-box textarea');
+        const saveNotesButton = document.querySelector('.notes-box button');
+
+        // Função para carregar as notas salvas
+        function carregarNotas() {
+            const notasSalvas = localStorage.getItem('notasProfessor');
+            if (notasSalvas) {
+                notesTextarea.value = notasSalvas;
+            }
+        }
+
+        // Função para salvar as notas
+        function salvarNotas() {
+            const notas = notesTextarea.value;
+            localStorage.setItem('notasProfessor', notas);
+            alert('Notas salvas com sucesso!');
+        }
+
+        // Carrega as notas ao abrir a página
+        carregarNotas();
+
+        // Salva as notas ao clicar no botão
+        saveNotesButton.addEventListener('click', salvarNotas);
+    </script>
+</body>
+</html>

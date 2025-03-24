@@ -1,0 +1,113 @@
+{% extends 'teacher.html' %}
+
+{% block content %}
+<div class="container-fluid mt-5">
+    <div class="row">
+        <!-- Sidebar (lado esquerdo) -->
+        <div class="col-auto">
+            <!-- O sidebar herdado de base.html já está aqui -->
+        </div>
+
+        <!-- Conteúdo principal (lado direito) -->
+        <div class="col">
+            <h2 class="display-4">Disponibilize materiais de apoio!</h2>
+
+            <!-- Mensagens -->
+            {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row">
+                <!-- Formulário de Upload de Materiais -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <form method="post" enctype="multipart/form-data" action="{% url 'enviar_materiais' %}">
+                                {% csrf_token %}
+                                
+                                <!-- Campo de seleção do tipo de material -->
+                                <div class="mb-3">
+                                    <label for="tipo" class="form-label">Tipo de Material</label>
+                                    <select name="tipo" id="tipo" class="form-select" required>
+                                        <option value="PDF">PDF</option>
+                                        <option value="OUTROS">Outros Tipos</option>
+                                    </select>
+                                </div>
+                                
+                                <!-- Campo de upload de arquivo -->
+                                <div class="mb-3">
+                                    <label for="material" class="form-label">Arquivo</label>
+                                    <input type="file" name="material" class="form-control" id="material" required>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-dark">Enviar material</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Materiais Enviados -->
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <h4 class="card-title">Materiais Enviados</h4>
+                            
+                            <!-- Filtro por tipo -->
+                            <div class="mb-3">
+                                <form method="get" class="d-flex">
+                                    <select name="tipo_filtro" class="form-select me-2">
+                                        <option value="">Todos os tipos</option>
+                                        <option value="PDF" {% if request.GET.tipo_filtro == 'PDF' %}selected{% endif %}>PDF</option>
+                                        <option value="OUTROS" {% if request.GET.tipo_filtro == 'OUTROS' %}selected{% endif %}>Outros</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-outline-dark">Filtrar</button>
+                                </form>
+                            </div>
+                            
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Nome</th>
+                                        <th>Tipo</th>
+                                        <th>Data</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for material in materiais %}
+                                    <tr>
+                                        <td>{{ material.nome }}</td>
+                                        <td>
+                                            <span class="badge bg-{% if material.tipo == 'PDF' %}primary{% else %}secondary{% endif %}">
+                                                {{ material.get_tipo_display }}
+                                            </span>
+                                        </td>
+                                        <td>{{ material.data_envio|date:"d/m/Y H:i" }}</td>
+                                        <td>
+                                            <a href="{% url 'deletar_material' material.id %}" class="btn btn-sm btn-danger">
+                                                <i class="cil-trash"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center">Nenhum material enviado ainda</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

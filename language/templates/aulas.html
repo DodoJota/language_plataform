@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+
+{% block title %}Aulas do Curso{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-2 mx-auto">
+  <div class="row">
+    <!-- Sidebar (lado esquerdo) -->
+    <div class="col-auto">
+      <!-- O sidebar herdado de base.html já está aqui -->
+    </div>
+
+    <!-- Conteúdo principal (lado direito) -->
+    <div class="col">
+      <div class="row fundo">
+        <!-- Player de vídeo -->
+        <div class="col-md-9">
+          <div class="card mb-4">
+            <div class="card-body">
+              <h2 id="titulo-aula" class="card-title">Selecione uma aula</h2>
+              <div class="ratio ratio-16x9">
+                <video id="player-video" controls>
+                  <source src="" type="video/mp4">
+                  Seu navegador não suporta o elemento de vídeo.
+                </video>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sidebar de módulos e aulas (lado direito) -->
+        <div class="col-md-3">
+          <div class="card mb-4"> 
+            <div class="card-body">
+              <h2 class="card-title">Português-A1</h2>
+              <div style="max-height: 70vh; overflow-y: auto;"> <!-- Scroll interno -->
+                <ul class="list-group">
+                  {% for modulo, aulas in videos_por_modulo.items %}
+                  <li class="list-group-item">
+                    <strong>Módulo {{ modulo }}</strong>
+                    <ul class="list-group mt-2">
+                      {% for aula in aulas %}
+                      <li class="list-group-item list-group-item-action" data-video="{{ aula.arquivo.url }}" data-titulo="{{ aula.titulo }}">
+                        Aula {{ aula.ordem }}: {{ aula.titulo }}
+                      </li>
+                      {% endfor %}
+                    </ul>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Área de anotações (embaixo do player e ao lado do sidebar) -->
+      <div class="row">
+        <!-- Box de anotações -->
+        <div class="col-md-9 ">
+          <div class="card">
+            <div class="card-body">
+              <h2 class="card-title">Anotações</h2>
+              <textarea id="anotacoes" class="form-control" rows="5" placeholder="Faça suas anotações aqui..."></textarea>
+              <button id="salvar-anotacoes" class="btn btn-dark mt-3">Salvar Anotações</button>
+              <p id="mensagem-salvo" class="text-success mt-2" style="display: none;">Anotações salvas!</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Área para exibir anotações salvas (embaixo do sidebar) -->
+        <div class="col-md-3">
+          <div class="card">
+            <div class="card-body" style="background-color: rgb(254, 242, 152);">
+              <h2 class="card-title text-center">Anotações Salvas</h2>
+              <div id="anotacoes-salvas" style="max-height: 300px; overflow-y: auto; background-color: rgb(254, 242, 152);">
+                <!-- As anotações salvas serão exibidas aqui -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Estilo para o player e área de anotações */
+  .card {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-title {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+  }
+
+  textarea {
+    resize: none; /* Impede o redimensionamento da área de texto */
+  }
+
+  #mensagem-salvo {
+    font-size: 0.9rem;
+  }
+
+  /* Estilo para o sidebar */
+  .list-group-item {
+    cursor: pointer;
+  }
+
+  .list-group-item-action:hover {
+    background-color: #f8f9fa;
+  }
+
+  /* Estilo para a área de anotações salvas */
+  #anotacoes-salvas {
+    font-size: 0.9rem;
+    padding: 10px;
+    background-color: #f8f9fa;
+    border-radius: 5px;
+  }
+</style>
+
+<script>
+  // Elementos da página
+  const playerVideo = document.getElementById('player-video');
+  const tituloAula = document.getElementById('titulo-aula');
+  const anotacoesTextarea = document.getElementById('anotacoes');
+  const mensagemSalvo = document.getElementById('mensagem-salvo');
+  const botaoSalvarAnotacoes = document.getElementById('salvar-anotacoes');
+  const anotacoesSalvasDiv = document.getElementById('anotacoes-salvas');
+
+  // Variável para armazenar a aula atual
+  let aulaAtual = '';
+
+  // Função para carregar as anotações salvas
+  function carregarAnotacoes() {
+    const anotacoes = localStorage.getItem(`anotacoes_${aulaAtual}`) || '';
+    anotacoesTextarea.value = anotacoes;
+    anotacoesSalvasDiv.textContent = anotacoes; // Exibe as anotações salvas
+  }
+
+  // Função para salvar as anotações
+  function salvarAnotacoes() {
+    const anotacoes = anotacoesTextarea.value;
+    localStorage.setItem(`anotacoes_${aulaAtual}`, anotacoes);
+    mensagemSalvo.style.display = 'block';
+    anotacoesSalvasDiv.textContent = anotacoes; // Atualiza as anotações salvas
+    setTimeout(() => {
+      mensagemSalvo.style.display = 'none';
+    }, 2000); // Esconde a mensagem após 2 segundos
+  }
+
+  // Carrega as anotações ao abrir a página
+  carregarAnotacoes();
+
+  // Salva as anotações ao clicar no botão
+  botaoSalvarAnotacoes.addEventListener('click', salvarAnotacoes);
+
+  // Função para carregar o vídeo e atualizar o título e anotações
+  document.querySelectorAll('.list-group-item-action').forEach(item => {
+    item.addEventListener('click', () => {
+      const videoSrc = item.getAttribute('data-video');
+      const titulo = item.getAttribute('data-titulo');
+
+      // Atualiza o vídeo e o título
+      playerVideo.querySelector('source').src = videoSrc;
+      playerVideo.load();
+      tituloAula.textContent = titulo;
+
+      // Atualiza a aula atual e carrega as anotações correspondentes
+      aulaAtual = videoSrc.split('/').pop().replace('.mp4', ''); // Extrai o nome do arquivo
+      carregarAnotacoes();
+    });
+  });
+</script>
+{% endblock %}

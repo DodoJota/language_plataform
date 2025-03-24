@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+
+{% block title %}Triste ou Feliz? - Praticar{% endblock %}
+
+{% block body_class %}bg-custom-faces{% endblock %}
+
+{% block content %}
+<div class="container mt-1">
+    <!-- Título do jogo -->
+    <h1 class="display-4">Triste ou Feliz?</h1>
+    <p class="lead">Aqui, o seu desempenho pode tornar o boneco feliz ou triste.</p>
+
+    <div class="row align-items-center">
+        <!-- Letras Tentadas (lado esquerdo) -->
+        <div class="col-md-3 mt-5 pt-5">
+            <div class="bg-warning p-3 rounded">
+                <h5>Tentativas erradas</h5>
+                <div id="letras-tentadas" class="mt-2 p-2 border rounded bg-light">
+                    Nenhuma ainda
+                </div>
+            </div>
+        </div>
+
+        <!-- Jogo (lado direito) -->
+        <div class="col-md-6">
+            <div class="d-flex flex-column align-items-center">
+                <!-- Cabeça do boneco -->
+                <div id="rosto" class="mb-4">
+                    <svg width="200" height="200">
+                        <circle cx="100" cy="100" r="60" fill="none" stroke="black" stroke-width="4" />
+                        <circle id="olho-esquerdo" cx="80" cy="85" r="7" fill="black" style="display: none;" />
+                        <circle id="olho-direito" cx="120" cy="85" r="7" fill="black" style="display: none;" />
+                        <circle id="nariz" cx="100" cy="100" r="5" fill="black" style="display: none;" />
+                        <circle id="orelha-esquerda" cx="40" cy="100" r="12" fill="none" stroke="black" stroke-width="4" style="display: none;" />
+                        <circle id="orelha-direita" cx="160" cy="100" r="12" fill="none" stroke="black" stroke-width="4" style="display: none;" />
+                        <path id="boca-triste" d="M70 130 Q100 110 130 130" stroke="black" stroke-width="4" fill="none" style="display: none;" />
+                        <path id="boca-feliz" d="M70 130 Q100 150 130 130" stroke="black" stroke-width="4" fill="none" style="display: none;" />
+                    </svg>
+                </div>
+
+                <!-- Espaço da palavra e botões -->
+                <div class="text-center">
+                  <p id="palavra" class="display-4 mb-4">_ _ _ _ _ _</p>
+                  <!-- Espaço para a letra -->
+                  <input id="input-letra" type="text" class="form-control text-center fs-3 mb-4 mx-auto" style="width: 200px; height: 70px;" maxlength="1" placeholder="letra">
+              
+                  <!-- Botões organizados em um quadrado -->
+                  <div class="d-flex flex-column align-items-center">
+                      <!-- Primeira linha de botões -->
+                      <div class="d-flex justify-content-center mb-3">
+                          <button id="botao-verificar" class="btn btn-dark btn-lg me-2" style="width: 150px;">Verificar</button>
+                          <button id="botao-reset" class="btn btn-warning btn-lg" style="width: 150px;">Resetar</button>
+                      </div>
+              
+                      <!-- Segunda linha de botões -->
+                      <div class="d-flex justify-content-center">
+                          <button id="botao-proxima-palavra" class="btn btn-success btn-lg me-2" style="width: 150px;">Próxima Palavra</button>
+                          <button id="botao-dica" class="btn btn-info btn-lg" style="width: 150px;">❓ Dica</button>
+                      </div>
+                  </div>
+              
+                  <!-- Dica e resultado -->
+                  <p id="dica-texto" class="mt-3 text-muted" style="display: none;"></p>
+                  <div id="resultado" class="mt-3 fs-5"></div>
+              </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+  .bg-avocado {
+    background-color: #6ba971; /* Verde abacate */
+    color: white; /* Cor do texto */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  }
+
+  #input-letra {
+    width: 80px;
+    height: 60px;
+    padding: 10px;
+    font-size: 24px;
+    text-transform: uppercase;
+  }
+
+  #botao-verificar, #botao-reset, #botao-proxima-palavra, #botao-dica {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+
+  #resultado {
+    font-size: 18px;
+    color: #666;
+    margin-top: 20px;
+  }
+
+  #letras-tentadas {
+    font-size: 18px;
+    color: #333;
+    text-align: center;
+  }
+
+  #rosto {
+    margin-bottom: 20px;
+  }
+</style>
+
+<script>
+  const palavra = document.getElementById('palavra');
+  const inputLetra = document.getElementById('input-letra');
+  const botaoVerificar = document.getElementById('botao-verificar');
+  const botaoReset = document.getElementById('botao-reset');
+  const botaoProximaPalavra = document.getElementById('botao-proxima-palavra');
+  const botaoDica = document.getElementById('botao-dica');
+  const dicaTexto = document.getElementById('dica-texto');
+  const resultado = document.getElementById('resultado');
+  const letrasTentadasDiv = document.getElementById('letras-tentadas');
+
+  // Elementos do rosto
+  const partesDoRosto = [
+    document.getElementById('olho-esquerdo'),
+    document.getElementById('olho-direito'),
+    document.getElementById('nariz'),
+    document.getElementById('orelha-esquerda'),
+    document.getElementById('orelha-direita'),
+    document.getElementById('boca-triste'),
+    document.getElementById('boca-feliz') // Adicionado a boca feliz aqui
+  ];
+
+  // Lista de palavras e dicas
+  const palavrasComDicas = [
+    { palavra: 'COMPUTADOR', dica: 'Usamos para programar e navegar na internet' },
+    { palavra: 'ELEFANTE', dica: 'Um dos maiores animais terrestres' },
+    { palavra: 'GIRASSOL', dica: 'Segue a luz do sol' },
+    { palavra: 'LARANJA', dica: 'Fruta cítrica rica em vitamina C' },
+    { palavra: 'MONTANHA', dica: 'Pode ser escalada e é muito alta' },
+    { palavra: 'PÁSSARO', dica: 'Animal que pode voar' },
+    { palavra: 'VIOLINO', dica: 'Instrumento de cordas tocado com arco' },
+    { palavra: 'ZEBRA', dica: 'Animal listrado preto e branco' }
+  ];
+  
+  let palavraSecreta = '';
+  let dicaAtual = '';
+  let letrasAcertadas = [];
+  let letrasErradas = [];
+  let erros = 0;
+
+  function escolherPalavra() {
+    const escolha = palavrasComDicas[Math.floor(Math.random() * palavrasComDicas.length)];
+    palavraSecreta = escolha.palavra;
+    dicaAtual = escolha.dica;
+    letrasAcertadas = [];
+    letrasErradas = [];
+    erros = 0;
+    palavra.textContent = palavraSecreta.split('').map(() => '_').join(' ');
+    resultado.textContent = '';
+    dicaTexto.style.display = 'none';
+    dicaTexto.textContent = `Dica: ${dicaAtual}`;
+    inputLetra.value = '';
+    // Oculta todas as partes do rosto, incluindo a boca feliz
+    partesDoRosto.forEach(parte => parte.style.display = 'none');
+    letrasTentadasDiv.textContent = 'Nenhuma ainda';
+  }
+
+  escolherPalavra();
+
+  botaoVerificar.addEventListener('click', () => {
+    const letraDigitada = inputLetra.value.toUpperCase();
+    if (letraDigitada.length !== 1) {
+      resultado.textContent = 'Por favor, digite apenas uma letra.';
+      return;
+    }
+
+    if (palavraSecreta.includes(letraDigitada)) {
+      letrasAcertadas.push(letraDigitada);
+      palavra.textContent = palavraSecreta.split('').map(letra => (letrasAcertadas.includes(letra) ? letra : '_')).join(' ');
+
+      if (!palavra.textContent.includes('_')) {
+        resultado.textContent = 'Parabéns! Você acertou a palavra!';
+        // Mostra todas as partes do rosto (exceto a boca triste) e a boca feliz
+        partesDoRosto.forEach(parte => {
+          if (parte.id !== 'boca-triste') {
+            parte.style.display = 'block';
+          }
+        });
+      }
+    } else {
+      if (!letrasErradas.includes(letraDigitada)) {
+        letrasErradas.push(letraDigitada);
+        partesDoRosto[erros].style.display = 'block';
+        erros++;
+      }
+      resultado.textContent = `Errou! Restam ${6 - erros} chances.`;
+      if (erros === 6) {
+        resultado.innerHTML = `Que pena! A palavra era <strong style="font-size: 1.5em;">${palavraSecreta}</strong>.`;
+      }
+    }
+
+    // Atualiza as letras tentadas
+    letrasTentadasDiv.textContent = letrasErradas.join(', ') || 'Nenhuma ainda';
+    inputLetra.value = '';
+  });
+
+  botaoDica.addEventListener('click', () => {
+    dicaTexto.style.display = 'block';
+  });
+
+  botaoReset.addEventListener('click', escolherPalavra);
+  botaoProximaPalavra.addEventListener('click', escolherPalavra);
+</script>
+{% endblock %}
