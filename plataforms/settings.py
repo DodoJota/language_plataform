@@ -35,7 +35,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
-LOGIN_REDIRECT_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = '/teacher'
 LOGOUT_REDIRECT_URL = '/language/login/'  
 
 # Application definition
