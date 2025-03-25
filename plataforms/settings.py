@@ -36,7 +36,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 
 LOGIN_REDIRECT_URL = '/accounts/login/'
-LOGOUT_REDIRECT_URL = '/language/login/'  
+LOGOUT_REDIRECT_URL = '/login/'  
 
 # Application definition
 
@@ -88,21 +88,19 @@ WSGI_APPLICATION = 'plataforms.wsgi.application'
 
 if "DATABASE_URL" in os.environ:
     DATABASES = {
-        "default": dj_database_url.config(default=os.getenv("DATABASE_URL"))
+        'default': dj_database_url.config(default=os.getenv("DATABASE_URL"))
     }
 else:
-
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
             'NAME': 'portugues',
             'USER': 'user_teste',
             'PASSWORD': 'pass_teste',
-            'HOST': 'localhost',  # ou o IP do servidor PostgreSQL
-            'PORT': '5432',  # Porta padrão do PostgreSQL
+            'HOST': 'localhost',
+            'PORT': '5432',
         }
     }
-
 
 
 # Password validation

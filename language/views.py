@@ -58,6 +58,7 @@ def contato(request):
         nome = request.POST.get('nome')
         email = request.POST.get('email')
         mensagem = request.POST.get('mensagem')
+        print(request.POST) 
 
         Contato.objects.create(nome=nome, email=email, mensagem=mensagem)
 
