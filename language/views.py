@@ -37,6 +37,9 @@ def aulas(request):
 def praticar(request):
     return render(request, 'praticar.html')
 
+def landing(request):
+    return render(request, 'landing.html')
+
 def flashcards(request):
     return render(request, 'flashcards.html')
 

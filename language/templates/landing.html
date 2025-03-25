@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>djuno - Plataforma Completa para Professores</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-green: #2e7d32;
+            --secondary-green: #388e3c;
+            --light-green: #8bc34a;
+            --accent-green: #a5d6a7;
+            --dark-green: #1b5e20;
+            --white: #ffffff;
+            --light-gray: #f5f5f5;
+            --dark-gray: #333333;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            color: var(--dark-gray);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        header {
+            background-color: var(--white);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-green);
+        }
+        
+        .logo span {
+            color: var(--dark-green);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+        
+        .nav-links li {
+            margin-left: 30px;
+        }
+        
+        .nav-links a {
+            text-decoration: none;
+            color: var(--dark-gray);
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--primary-green);
+        }
+        
+        .cta-button {
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        .cta-button:hover {
+            background-color: var(--dark-green);
+            color: var(--white);
+        }
+        
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, var(--light-green), var(--primary-green));
+            color: var(--white);
+            padding: 150px 0 100px;
+            text-align: center;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+        
+        .hero p {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        
+        .secondary-button {
+            background-color: transparent;
+            color: var(--white);
+            border: 2px solid var(--white);
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .secondary-button:hover {
+            background-color: var(--white);
+            color: var(--primary-green);
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 100px 0;
+            background-color: var(--light-gray);
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-title h2 {
+            font-size: 36px;
+            color: var(--dark-green);
+            margin-bottom: 15px;
+        }
+        
+        .section-title p {
+            color: var(--dark-gray);
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature-card {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            font-size: 40px;
+            color: var(--primary-green);
+            margin-bottom: 20px;
+        }
+        
+        .feature-card h3 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: var(--dark-green);
+        }
+        
+        /* Dashboard Preview */
+        .dashboard {
+            padding: 100px 0;
+            background-color: var(--white);
+        }
+        
+        .dashboard-content {
+            display: flex;
+            align-items: center;
+            gap: 50px;
+        }
+        
+        .dashboard-text {
+            flex: 1;
+        }
+        
+        .dashboard-text h2 {
+            font-size: 36px;
+            color: var(--dark-green);
+            margin-bottom: 20px;
+        }
+        
+        .dashboard-text ul {
+            list-style: none;
+            margin: 30px 0;
+        }
+        
+        .dashboard-text ul li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 30px;
+        }
+        
+        .dashboard-text ul li:before {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: var(--primary-green);
+            position: absolute;
+            left: 0;
+            top: 2px;
+        }
+        
+        .dashboard-image {
+            flex: 1;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dashboard-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        
+        /* Pricing Section */
+        .pricing {
+            padding: 100px 0;
+            background-color: var(--light-gray);
+            text-align: center;
+        }
+        
+        .pricing-cards {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 50px;
+            flex-wrap: wrap;
+        }
+        
+        .pricing-card {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 40px 30px;
+            width: 300px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+            position: relative;
+        }
+        
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .pricing-card.popular {
+            border: 2px solid var(--primary-green);
+        }
+        
+        .popular-badge {
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            background-color: var(--primary-green);
+            color: var(--white);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+        }
+        
+        .pricing-card h3 {
+            font-size: 24px;
+            color: var(--dark-green);
+            margin-bottom: 15px;
+        }
+        
+        .price {
+            font-size: 48px;
+            font-weight: 700;
+            color: var(--primary-green);
+            margin-bottom: 20px;
+        }
+        
+        .price span {
+            font-size: 16px;
+            font-weight: 400;
+            color: var(--dark-gray);
+        }
+        
+        .pricing-features {
+            list-style: none;
+            margin: 30px 0;
+        }
+        
+        .pricing-features li {
+            margin-bottom: 15px;
+            position: relative;
+            padding-left: 25px;
+        }
+        
+        .pricing-features li:before {
+            content: "\f00c";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: var(--primary-green);
+            position: absolute;
+            left: 0;
+            top: 2px;
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            padding: 100px 0;
+            background-color: var(--white);
+        }
+        
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .testimonial-card {
+            background-color: var(--light-gray);
+            border-radius: 10px;
+            padding: 30px;
+            position: relative;
+        }
+        
+        .testimonial-card:before {
+            content: "\f10d";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: var(--accent-green);
+            font-size: 50px;
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            opacity: 0.3;
+        }
+        
+        .testimonial-content {
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+        
+        .author-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 15px;
+        }
+        
+        .author-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .author-info h4 {
+            font-size: 18px;
+            color: var(--dark-green);
+            margin-bottom: 5px;
+        }
+        
+        .author-info p {
+            font-size: 14px;
+            color: var(--dark-gray);
+            opacity: 0.7;
+        }
+        
+        /* CTA Section */
+        .cta {
+            background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
+            color: var(--white);
+            padding: 100px 0;
+            text-align: center;
+        }
+        
+        .cta h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        
+        .cta p {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto 40px;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark-green);
+            color: var(--white);
+            padding: 70px 0 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            margin-bottom: 50px;
+        }
+        
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-column h3:after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2px;
+            background-color: var(--light-green);
+        }
+        
+        .footer-links {
+            list-style: none;
+        }
+        
+        .footer-links li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-links a {
+            color: var(--accent-green);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-links a:hover {
+            color: var(--white);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .social-links a {
+            color: var(--white);
+            background-color: rgba(255, 255, 255, 0.1);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+        
+        .social-links a:hover {
+            background-color: var(--light-green);
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .dashboard-content {
+                flex-direction: column;
+            }
+            
+            .dashboard-text, .dashboard-image {
+                width: 100%;
+            }
+            
+            .dashboard-image {
+                margin-top: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">dj<span>Uno</span></div>
+                <ul class="nav-links">
+                    <li><a href="#features">Recursos</a></li>
+                    <li><a href="#dashboard">Dashboard</a></li>
+                    <li><a href="#pricing">Planos</a></li>
+                    <li><a href="#testimonials">Depoimentos</a></li>
+                    <li><a href="#" class="cta-button">Começar Agora</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Eleve Seu Ensino de Português Online</h1>
+            <p>A plataforma tudo-em-um para professores que desejam oferecer cursos online de alta qualidade, gerenciar alunos e expandir seu negócio.</p>
+            <div class="hero-buttons">
+                <a href="#" class="cta-button">Experimente Gratuitamente</a>
+                <a href="#" class="secondary-button">Ver Demonstração</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <div class="section-title">
+                <h2>Tudo o que você precisa em um só lugar</h2>
+                <p>Desenvolvemos ferramentas poderosas para simplificar seu trabalho e melhorar a experiência dos seus alunos</p>
+            </div>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-video"></i>
+                    </div>
+                    <h3>Cursos Online Completos</h3>
+                    <p>Crie e organize seus cursos com vídeos, materiais de apoio e estrutura de módulos. Tudo personalizável ao seu estilo de ensino.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <h3>Calendário Integrado</h3>
+                    <p>Sincronize automaticamente com seu calendário de aulas do Italki, Preply ou outros. Nunca mais perca uma aula ou compromisso.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-sticky-note"></i>
+                    </div>
+                    <h3>Post-its Digitais</h3>
+                    <p>Anotações rápidas, lembretes e checklist organizados diretamente no seu dashboard. Acesse de qualquer dispositivo.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-gamepad"></i>
+                    </div>
+                    <h3>Jogos Educativos</h3>
+                    <p>Ofereça flashcards interativos, quizzes de gramática e outros jogos para seus alunos praticarem fora das aulas.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>Comunidade de Alunos</h3>
+                    <p>Crie um espaço exclusivo para seus alunos interagirem, praticarem juntos e tirarem dúvidas entre as aulas.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-edit"></i>
+                    </div>
+                    <h3>Estúdio de Vídeo Integrado</h3>
+                    <p>Grave, edite e publique seus vídeos diretamente na plataforma, sem necessidade de softwares complexos.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dashboard Preview -->
+    <section class="dashboard" id="dashboard">
+        <div class="container">
+            <div class="dashboard-content">
+                <div class="dashboard-text">
+                    <h2>Dashboard Intuitivo para Professores</h2>
+                    <p>Gerencie todos os aspectos do seu negócio de ensino de português em um painel centralizado e fácil de usar.</p>
+                    <ul>
+                        <li>Visualize todas as suas turmas e alunos em um só lugar</li>
+                        <li>Acompanhe o progresso dos alunos com relatórios detalhados</li>
+                        <li>Receba pagamentos e gerencie sua renda</li>
+                        <li>Comunique-se facilmente com seus alunos</li>
+                        <li>Atualize seus cursos e materiais com alguns cliques</li>
+                    </ul>
+                    <a href="#" class="cta-button">Experimente o Dashboard</a>
+                </div>
+                <div class="dashboard-image">
+                    <img src="https://via.placeholder.com/600x400/388e3c/ffffff?text=Teacher+Dashboard+Preview" alt="Dashboard do Professor">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="pricing" id="pricing">
+        <div class="container">
+            <div class="section-title">
+                <h2>Planos Acessíveis para Todo Tipo de Professor</h2>
+                <p>Escolha o plano que melhor se adapta ao seu negócio e comece a crescer hoje mesmo</p>
+            </div>
+            <div class="pricing-cards">
+                <div class="pricing-card">
+                    <h3>Básico</h3>
+                    <div class="price">R$29<span>/mês</span></div>
+                    <ul class="pricing-features">
+                        <li>1 curso ativo</li>
+                        <li>Até 50 alunos</li>
+                        <li>5GB de armazenamento</li>
+                        <li>Dashboard básico</li>
+                        <li>Suporte por e-mail</li>
+                    </ul>
+                    <a href="#" class="secondary-button">Começar</a>
+                </div>
+                <div class="pricing-card popular">
+                    <div class="popular-badge">Mais Popular</div>
+                    <h3>Profissional</h3>
+                    <div class="price">R$59<span>/mês</span></div>
+                    <ul class="pricing-features">
+                        <li>5 cursos ativos</li>
+                        <li>Até 200 alunos</li>
+                        <li>20GB de armazenamento</li>
+                        <li>Dashboard completo</li>
+                        <li>Jogos educativos</li>
+                        <li>Suporte prioritário</li>
+                    </ul>
+                    <a href="#" class="cta-button">Começar</a>
+                </div>
+                <div class="pricing-card">
+                    <h3>Premium</h3>
+                    <div class="price">R$99<span>/mês</span></div>
+                    <ul class="pricing-features">
+                        <li>Cursos ilimitados</li>
+                        <li>Alunos ilimitados</li>
+                        <li>50GB de armazenamento</li>
+                        <li>Todos os recursos</li>
+                        <li>Estúdio de vídeo</li>
+                        <li>Suporte 24/7</li>
+                    </ul>
+                    <a href="#" class="secondary-button">Começar</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials" id="testimonials">
+        <div class="container">
+            <div class="section-title">
+                <h2>O que os professores dizem</h2>
+                <p>Professores de português em todo o mundo estão transformando seus negócios com nossa plataforma</p>
+            </div>
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>Depois de usar a LusofoniaPro, minhas vendas de cursos aumentaram em 70%. A plataforma é intuitiva e me poupa horas de trabalho administrativo.</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="https://via.placeholder.com/50x50" alt="Ana Silva">
+                        </div>
+                        <div class="author-info">
+                            <h4>Ana Silva</h4>
+                            <p>Professora no Italki há 5 anos</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>Meus alunos adoram os jogos de gramática e flashcards. Eles praticam muito mais agora e vejo resultados incríveis no aprendizado.</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="https://via.placeholder.com/50x50" alt="Carlos Mendes">
+                        </div>
+                        <div class="author-info">
+                            <h4>Carlos Mendes</h4>
+                            <p>Professor particular há 8 anos</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-content">
+                        <p>Finalmente posso oferecer cursos estruturados sem precisar de múltiplas plataformas. A integração com meu calendário do Preply é perfeita!</p>
+                    </div>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">
+                            <img src="https://via.placeholder.com/50x50" alt="Juliana Oliveira">
+                        </div>
+                        <div class="author-info">
+                            <h4>Juliana Oliveira</h4>
+                            <p>Professora no Preply há 3 anos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta">
+        <div class="container">
+            <h2>Pronto para Transformar Seu Ensino de Português?</h2>
+            <p>Junte-se a milhares de professores que estão economizando tempo, organizando melhor seus cursos e aumentando sua renda.</p>
+            <a href="#" class="cta-button">Comece Seu Período de Teste Gratuito</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>LusofoniaPro</h3>
+                    <p>A plataforma completa para professores de português online que desejam oferecer cursos de alta qualidade e gerenciar seus negócios com eficiência.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Recursos</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Cursos Online</a></li>
+                        <li><a href="#">Dashboard do Professor</a></li>
+                        <li><a href="#">Jogos Educativos</a></li>
+                        <li><a href="#">Comunidade de Alunos</a></li>
+                        <li><a href="#">Estúdio de Vídeo</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Suporte</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Central de Ajuda</a></li>
+                        <li><a href="#">Tutoriais</a></li>
+                        <li><a href="#">FAQ</a></li>
+                        <li><a href="#">Contato</a></li>
+                        <li><a href="#">Status do Serviço</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Empresa</h3>
+                    <ul class="footer-links">
+                        <li><a href="#">Sobre Nós</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Carreiras</a></li>
+                        <li><a href="#">Termos de Serviço</a></li>
+                        <li><a href="#">Política de Privacidade</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2023 LusofoniaPro. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
