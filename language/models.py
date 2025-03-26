@@ -42,6 +42,7 @@ class Video(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)  
     is_teacher = models.BooleanField(default=False)  # True para professor, False para estudante
+    professor = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='students')  # Aluno associado a um professor
 
     def __str__(self):
         return f"Perfil de {self.user.username}"
