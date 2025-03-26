@@ -40,7 +40,7 @@ class Video(models.Model):
         return self.titulo
     
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)  # Relação 1 para 1 com o User
+    user = models.OneToOneField(User, on_delete=models.CASCADE)  
     is_teacher = models.BooleanField(default=False)  # True para professor, False para estudante
 
     def __str__(self):

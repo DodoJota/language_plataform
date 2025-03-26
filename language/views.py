@@ -7,8 +7,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.core.files.storage import FileSystemStorage
 from .models import Material, Contato, Video
 
-
-
 @login_required
 def portugues(request):
     return render(request, "portugues.html")
@@ -98,6 +96,11 @@ def create_user(request):
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
+        confirm_password = request.POST.get('confirm_password')
+
+        if password != confirm_password:
+            messages.error(request, 'As senhas não coincidem!')
+            return render(request, 'create_user.html')
 
         try:
             # Cria o usuário
@@ -105,16 +108,12 @@ def create_user(request):
             user.save()
 
             messages.success(request, 'Usuário criado com sucesso!')
-            return redirect('login')  # Redireciona para a página de login ou para outra página
+            return redirect('login')
 
         except Exception as e:
             messages.error(request, f'Erro ao criar o usuário: {e}')
 
-    return render(request, 'create_user.html')  # Crie um template para este formulário
-
-from django.shortcuts import render, redirect
-from django.contrib import messages
-from .models import Material
+    return render(request, 'create_user.html')
 
 def enviar_materiais(request):
     if request.method == 'POST':
