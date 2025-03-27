@@ -124,6 +124,41 @@
 </style>
 
 <script>
+    // Supondo que já tenha a função que carrega o vídeo e anotações
+    document.querySelectorAll('.list-group-item-action').forEach(item => {
+    item.addEventListener('click', () => {
+      const videoSrc = item.getAttribute('data-video');
+      const titulo = item.getAttribute('data-titulo');
+
+      // Atualiza o vídeo e o título
+      playerVideo.querySelector('source').src = videoSrc;
+      playerVideo.load();
+      tituloAula.textContent = titulo;
+
+      // Atualiza a aula atual
+      aulaAtual = videoSrc.split('/').pop().replace('.mp4', ''); // Extrai o nome do arquivo
+      carregarAnotacoes();
+
+      // Envia uma requisição para o servidor quando o aluno assistir a aula
+      fetch(`/assistir_aula/${aulaAtual}/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        }
+      })
+      .then(response => {
+        if (response.ok) {
+          console.log('Aula assistida com sucesso!');
+        } else {
+          console.log('Erro ao marcar aula como assistida.');
+        }
+      })
+      .catch(error => {
+        console.error('Erro na requisição:', error);
+      });
+    });
+  });
   // Elementos da página
   const playerVideo = document.getElementById('player-video');
   const tituloAula = document.getElementById('titulo-aula');

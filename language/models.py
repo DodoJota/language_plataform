@@ -39,10 +39,22 @@ class Video(models.Model):
     def __str__(self):
         return self.titulo
     
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)  
-    is_teacher = models.BooleanField(default=False)  # True para professor, False para estudante
-    professor = models.ForeignKey('self', null=True, blank=True, on_delete=models.SET_NULL, related_name='students')  # Aluno associado a um professor
+class Teacher(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):
-        return f"Perfil de {self.user.username}"
+        return f"Professor: {self.user.username}"
+    
+class Student(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(
+    Teacher,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name="students"
+    )
+
+
+    def __str__(self):
+        return f"Estudante: {self.user.username}"

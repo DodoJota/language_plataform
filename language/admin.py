@@ -3,17 +3,21 @@ from django.contrib import admin
 # Register your models here.
 
 from django.contrib import admin
-from .models import Profile
-from django.contrib.auth.models import User
+from .models import Teacher, Student
 
-class ProfileAdmin(admin.ModelAdmin):
-    list_display = ('user', 'is_teacher', 'professor')  # Mostra 'professor' na lista de perfis
-    search_fields = ('user__username', 'user__email')  # Permite buscar por username e email do usuário
-    list_filter = ('is_teacher',)  # Filtra por professores ou alunos
+class TeacherAdmin(admin.ModelAdmin):
+    list_display = ('user',)
+    search_fields = ('user__username', 'user__email')
+
+class StudentAdmin(admin.ModelAdmin):
+    list_display = ('user', 'teacher')
+    search_fields = ('user__username', 'user__email')
+    list_filter = ('teacher',)
     fieldsets = (
         (None, {
-            'fields': ('user', 'is_teacher', 'professor')  # Adiciona o campo professor no formulário de criação/edição
+            'fields': ('user', 'teacher')
         }),
     )
 
-admin.site.register(Profile, ProfileAdmin)
+admin.site.register(Teacher, TeacherAdmin)
+admin.site.register(Student, StudentAdmin)

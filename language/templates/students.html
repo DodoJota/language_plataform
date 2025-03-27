@@ -1,0 +1,197 @@
+{% extends "teacher.html" %}
+{% load static %}
+
+{% block title %}Alunos - Painel do Professor{% endblock %}
+
+{% block content %}
+<div class="dashboard-header">
+    <h1 class="display-4">Gestão de Alunos</h1>
+    <p class="lead text-muted">Controle e comunicação com sua turma</p>
+</div>
+
+<div class="row mb-4">
+    <!-- Cartão de Resumo -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body text-center d-flex flex-column justify-content-center">
+                <div class="mb-3">
+                    <i class="fas fa-users fa-3x text-primary"></i>
+                </div>
+                <h2 class="card-title h5">Total de Alunos</h2>
+                <p class="display-4 mb-0 text-primary">{{ total_alunos }}</p>
+                <small class="text-muted">Sua turma atual</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cartão de Ações Rápidas -->
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex align-items-center">
+                <div class="w-100">
+                    <h2 class="h5 mb-4">Ações Rápidas</h2>
+                    <div class="d-flex justify-content-between">
+                        <a href="#" class="btn btn-outline-primary btn-lg px-4">
+                            <i class="fas fa-envelope mr-2"></i> Enviar Mensagem Geral
+                        </a>
+                        <a href="#" class="btn btn-outline-success btn-lg px-4">
+                            <i class="fas fa-plus-circle mr-2"></i> Adicionar Aluno
+                        </a>
+                        <a href="#" class="btn btn-outline-info btn-lg px-4">
+                            <i class="fas fa-chart-line mr-2"></i> Relatórios
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de Alunos -->
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0 py-3">
+        <h2 class="h5 mb-0">Lista de Alunos</h2>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="thead-light">
+                    <tr>
+                        <th class="border-0">#</th>
+                        <th class="border-0">Aluno</th>
+                        <th class="border-0">Contato</th>
+                        <th class="border-0">Último Acesso</th>
+                        <th class="border-0 text-center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for aluno in alunos %}
+                    <tr>
+                        <td class="align-middle">{{ forloop.counter }}</td>
+                        <td class="align-middle">
+                            <div class="d-flex align-items-center">
+                                <div class="avatar-sm mr-3">
+                                    <span class="avatar-title rounded-circle bg-primary text-white">
+                                        {{ aluno.user.first_name|first|default:aluno.user.username|first|upper }}
+                                    </span>
+                                </div>
+                                <div>
+                                    <h6 class="mb-0">{{ aluno.user.get_full_name|default:aluno.user.username }}</h6>
+                                    <small class="text-muted">@{{ aluno.user.username }}</small>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="align-middle">
+                            <a href="mailto:{{ aluno.user.email }}" class="text-primary">{{ aluno.user.email }}</a>
+                        </td>
+                        <td class="align-middle">
+                            {% if aluno.user.last_login %}
+                                <span class="badge badge-light">
+                                    {{ aluno.user.last_login|timesince }} atrás
+                                </span>
+                            {% else %}
+                                <span class="badge badge-secondary">Nunca acessou</span>
+                            {% endif %}
+                        </td>
+                        <td class="align-middle text-center">
+                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3 send-message-btn"
+                                    data-student-id="{{ aluno.id }}"
+                                    data-student-name="{{ aluno.user.get_full_name|default:aluno.user.username }}">
+                                <i class="far fa-paper-plane mr-1"></i> Mensagem
+                            </button>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center py-5">
+                            <div class="py-5">
+                                <i class="fas fa-user-graduate fa-3x text-muted mb-3"></i>
+                                <p class="h5 text-muted">Nenhum aluno cadastrado</p>
+                                <p class="text-muted">Adicione alunos para começar a gerenciar sua turma</p>
+                                <a href="#" class="btn btn-primary mt-2">
+                                    <i class="fas fa-plus mr-1"></i> Adicionar Aluno
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal para enviar mensagem (hidden por padrão) -->
+<div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Enviar Mensagem</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="messageForm">
+                    <div class="form-group">
+                        <label>Para:</label>
+                        <input type="text" id="studentName" class="form-control" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>Assunto:</label>
+                        <input type="text" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mensagem:</label>
+                        <textarea class="form-control" rows="5" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="submit" form="messageForm" class="btn btn-primary">
+                    <i class="far fa-paper-plane mr-1"></i> Enviar Mensagem
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .avatar-sm {
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .avatar-title {
+        font-weight: 600;
+        font-size: 1.1rem;
+    }
+    .send-message-btn {
+        transition: all 0.2s;
+    }
+    .send-message-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+    }
+    .table-hover tbody tr {
+        transition: all 0.2s;
+    }
+    .table-hover tbody tr:hover {
+        transform: translateX(4px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+</style>
+
+<script>
+$(document).ready(function() {
+    $('.send-message-btn').click(function() {
+        var studentName = $(this).data('student-name');
+        $('#studentName').val(studentName);
+        $('#messageModal').modal('show');
+    });
+});
+</script>
+{% endblock %}

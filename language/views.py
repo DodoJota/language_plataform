@@ -5,7 +5,10 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.core.files.storage import FileSystemStorage
-from .models import Material, Contato, Video
+from .models import Material, Contato, Video, Teacher, Student
+
+from django.shortcuts import get_object_or_404
+
 
 @login_required
 def portugues(request):
@@ -21,6 +24,20 @@ def teacher(request):
     }
     return render(request, 'teacher.html', context)
 
+@login_required
+def students_dashboard(request):
+    try:
+        teacher = Teacher.objects.get(user=request.user)
+        alunos = teacher.students.all().select_related('user')
+    except Teacher.DoesNotExist:
+        return redirect('login')
+
+    context = {
+        'alunos': alunos,
+        'total_alunos': alunos.count(),
+    }
+    return render(request, 'students.html', context)
+
 def aulas(request):
     videos = Video.objects.all().order_by('modulo', 'ordem')
     videos_por_modulo = {}
@@ -34,6 +51,9 @@ def aulas(request):
 
 def praticar(request):
     return render(request, 'praticar.html')
+
+def students(request):
+    return render(request, 'students.html')
 
 def landing(request):
     return render(request, 'landing.html')
@@ -91,6 +111,7 @@ def logout_view(request):
     logout(request)
     return redirect("/login/")
 
+
 def create_user(request):
     if request.method == 'POST':
         username = request.POST.get('username')
@@ -98,8 +119,24 @@ def create_user(request):
         password = request.POST.get('password')
         confirm_password = request.POST.get('confirm_password')
 
+        # Verifica se todos os campos foram preenchidos
+        if not username or not email or not password or not confirm_password:
+            messages.error(request, 'Todos os campos são obrigatórios!')
+            return render(request, 'create_user.html')
+
+        # Verifica se as senhas coincidem
         if password != confirm_password:
             messages.error(request, 'As senhas não coincidem!')
+            return render(request, 'create_user.html')
+
+        # Verifica se o username já existe
+        if User.objects.filter(username=username).exists():
+            messages.error(request, 'Nome de usuário já está em uso!')
+            return render(request, 'create_user.html')
+
+        # Verifica se o email já existe
+        if User.objects.filter(email=email).exists():
+            messages.error(request, 'Já existe uma conta com este email!')
             return render(request, 'create_user.html')
 
         try:
@@ -107,7 +144,7 @@ def create_user(request):
             user = User.objects.create_user(username=username, email=email, password=password)
             user.save()
 
-            messages.success(request, 'Usuário criado com sucesso!')
+            messages.success(request, 'Usuário criado com sucesso! Faça login para continuar.')
             return redirect('login')
 
         except Exception as e:
@@ -192,13 +229,6 @@ def deletar_video(request, video_id):
 
 
 ##############################################################
-"""
-def portugues(request):
-    return render(request, 'portugues.html')
-"""
 
-# CRIAR UM HOME MAIS BONITO
-# CRIAR AULAS (PLAYER, NOTAS, SIDEBAR)
-# MELHORAR FUNCIONAMENTO DOS DOS JOGOS
 # PENSAR EM INTEGRAÇÃO MARCACAO DE AULA COM GOOGLE CALENDAR DO TUTOR VIA API GOOGLE
 # OFERECER PACOTES COMO NO HIWELL

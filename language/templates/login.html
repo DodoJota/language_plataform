@@ -100,9 +100,46 @@
         .register-button:hover {
             background-color: #f1f1f1; /* Cor do fundo ao passar o mouse */
         }
+                /* Container das mensagens */
+        .message-container {
+            position: fixed;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: auto;
+            max-width: 90%;
+            z-index: 1000;
+            text-align: center;
+        }
+
+        /* Estilos das mensagens */
+        .message {
+            background-color: #4CAF50; /* Verde para sucesso */
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: inline-block;
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        /* Mensagens de erro */
+        .message.error {
+            background-color: #f44336; /* Vermelho para erro */
+        }
     </style>
 </head>
 <body>
+    <!-- Container para as mensagens -->
+    <div id="message-container" class="message-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+    </div>
     <div class="login-container">
         <!-- Logo do Django -->
         <div class="logo">
@@ -140,5 +177,16 @@
             <button class="register-button">Registe-se</button>
         </a>
     </div>
+    <script>
+        setTimeout(function() {
+            var messages = document.querySelectorAll('.message');
+            messages.forEach(function(message) {
+                message.style.opacity = '0';
+                setTimeout(function() {
+                    message.remove();
+                }, 500);
+            });
+        }, 3000);
+    </script>    
 </body>
 </html>

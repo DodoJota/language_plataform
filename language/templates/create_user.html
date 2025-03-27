@@ -6,7 +6,7 @@
     <title>Criar Novo Usuário</title>
     {% load static %}
     <link rel="stylesheet" href="{% static 'css/styles.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">  <!-- Para a logo -->
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@coreui/coreui/dist/css/coreui.min.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
     <style>
@@ -88,18 +88,32 @@
 
         .register-button {
             margin-top: 15px;
-            width: 100%;
+            display: inline-block;
             padding: 12px;
-            background-color: #ffffff; /* Cor do botão "Registe-se" */
-            border: 1px solid #8bc34a; /* Cor da borda */
-            color: #8bc34a; /* Cor do texto */
-            font-size: 1rem;
-            cursor: pointer;
             border-radius: 4px;
+            background-color: #ffffff;
+            border: 1px solid #8bc34a;
+            color: #8bc34a;
+            font-size: 1rem;
+            text-decoration: none;
+            text-align: center;
+            width: 100%;
         }
 
         .register-button:hover {
-            background-color: #f1f1f1; /* Cor do fundo ao passar o mouse */
+            background-color: #f1f1f1;
+        }
+
+        /* Mensagens do Django */
+        .messages {
+            list-style: none;
+            padding: 0;
+        }
+
+        .messages li {
+            color: red;
+            font-size: 0.875rem;
+            margin-top: 10px;
         }
     </style>
 </head>
@@ -113,35 +127,41 @@
         <!-- Título -->
         <h2>Criar Novo Usuário</h2>
 
+        <!-- Exibir mensagens do Django -->
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
         <!-- Formulário de Criação de Usuário -->
         <form method="POST">
             {% csrf_token %}
-            
+
             <!-- Campo de E-mail -->
-            <input type="email" name="email" placeholder="E-mail" required>
+            <label for="email">E-mail</label>
+            <input type="email" name="email" id="email" placeholder="E-mail" required>
 
             <!-- Campo de Usuário -->
-            <input type="text" name="username" placeholder="Nome de Usuário" required>
+            <label for="username">Nome de Usuário</label>
+            <input type="text" name="username" id="username" placeholder="Nome de Usuário" required>
 
             <!-- Campo de Senha -->
-            <input type="password" name="password" placeholder="Senha" required>
+            <label for="password">Senha</label>
+            <input type="password" name="password" id="password" placeholder="Senha" required>
 
             <!-- Campo de Confirmação de Senha -->
-            <input type="password" name="confirm_password" placeholder="Confirmar Senha" required>
+            <label for="confirm_password">Confirmar Senha</label>
+            <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirmar Senha" required>
 
             <!-- Botão de Criação -->
             <button type="submit">Criar Conta</button>
+        </form>
 
-            <!-- Mensagem de erro -->
-            {% if erro %}
-                <p class="erro">{{ erro }}</p>
-            {% endif %}
-        </form>       
-
-        <!-- Botão de Voltar ao Login -->
-        <a href="{% url 'login' %}">
-            <button class="register-button">Já tem uma conta? Entrar</button>
-        </a>
+        <!-- Link para o Login -->
+        <a href="{% url 'login' %}" class="register-button">Já tem uma conta? Entrar</a>
     </div>
 </body>
 </html>
