@@ -58,3 +58,22 @@ class Student(models.Model):
 
     def __str__(self):
         return f"Estudante: {self.user.username}"
+    
+
+class Topico(models.Model):
+    titulo = models.CharField(max_length=255)
+    conteudo = models.TextField()
+    autor = models.ForeignKey(User, on_delete=models.CASCADE)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+    
+    def __str__(self):
+        return self.titulo
+
+class Resposta(models.Model):
+    topico = models.ForeignKey(Topico, on_delete=models.CASCADE, related_name='respostas')
+    autor = models.ForeignKey(User, on_delete=models.CASCADE)
+    conteudo = models.TextField()
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Resposta de {self.autor} em {self.topico.titulo}"

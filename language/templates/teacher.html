@@ -185,7 +185,7 @@
             <li class="nav-item"><a class="nav-link" href="{% url 'enviar_materiais' %}"><i class="nav-icon cil-folder"></i> MATERIAIS</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'students' %}"><i class="nav-icon cil-user"></i> ALUNOS</a></li>
             <li class="nav-item"><a class="nav-link" href="#"><i class="nav-icon cil-video"></i> LIVE <span class="badge bg-warning btn-sm">Breve</span></a></li>
-            <li class="nav-item"><a class="nav-link" href="{% url 'portugues' %}"><i class="nav-icon cil-zoom-in"></i> Estudante</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'portugues' %}"><i class="nav-icon cil-zoom-in"></i> Visão do Estudante</a></li>
             <li class="nav-item mt-auto"><a class="nav-link" href="#"><i class="nav-icon cil-info"></i> AJUDA</a></li>
             <li class="nav-item">
                 <form action="{% url 'logout' %}" method="post">
@@ -229,9 +229,10 @@
             </div>
         </div>
     
-        <!-- Seção de Aulas e Materiais (lado a lado) -->
+        <!-- Seção de Aulas, Materiais e Alunos (lado a lado) -->
         <div class="row">
-            <div class="col-md-6">
+            <!-- Card de Aulas -->
+            <div class="col-md-4">
                 <div class="dashboard-card card-com-fundo-aulas">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2 class="mb-0">
@@ -240,9 +241,8 @@
                         <span class="badge bg-primary rounded-pill">{{ total_aulas|default:"0" }} itens</span>
                     </div>
                     
-                    <!-- Card idêntico ao de Materiais, mas com ícone de aula -->
                     <div class="row">
-                        <div class="col-md-12">  <!-- Única coluna ocupando toda a largura -->
+                        <div class="col-md-12">
                             <div class="metric-card bg-primary bg-opacity-10 p-3 rounded mb-3">
                                 <div class="d-flex align-items-center">
                                     <i class="cil-video text-primary me-2 fs-4"></i>
@@ -255,17 +255,16 @@
                         </div>
                     </div>
                     
-                    <div class="d-grid mt-2" style="width: 30%;">
+                    <div class="d-grid mt-2">
                         <a href="{% url 'enviar_videos' %}" class="btn btn-dark">
                             <i class="cil-cloud-upload me-2"></i> Gerenciar Aulas
                         </a>
                     </div>
                 </div>
             </div>
-            
 
-            <!-- Seção de Materiais (direita) -->
-            <div class="col-md-6">
+            <!-- Card de Materiais -->
+            <div class="col-md-4">
                 <div class="dashboard-card">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2 class="mb-0">
@@ -299,9 +298,41 @@
                         </div>
                     </div>
                     
-                    <div class="d-grid mt-2" style="width: 30%;">
+                    <div class="d-grid mt-2">
                         <a href="{% url 'enviar_materiais' %}" class="btn btn-dark">
                             <i class="cil-cloud-upload me-2"></i> Gerenciar Materiais
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOVO Card de Alunos -->
+            <div class="col-md-4">
+                <div class="dashboard-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="mb-0">
+                            <i class="cil-user me-2"></i> Alunos
+                        </h2>
+                        <span class="badge bg-success rounded-pill">{{ total_alunos }} ativos</span>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="metric-card bg-success bg-opacity-10 p-3 rounded mb-3">
+                                <div class="d-flex align-items-center">
+                                    <i class="cil-people text-success me-2 fs-4"></i>
+                                    <div>
+                                        <h5 class="mb-0">{{ total_alunos }}</h5>
+                                        <small class="text-muted">Total de alunos</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-grid mt-2">
+                        <a href="{% url 'students' %}" class="btn btn-dark">
+                            <i class="cil-list me-2"></i> Gerenciar Alunos
                         </a>
                     </div>
                 </div>

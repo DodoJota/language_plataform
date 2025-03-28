@@ -4,43 +4,81 @@
 {% block title %}Alunos - Painel do Professor{% endblock %}
 
 {% block content %}
+{% csrf_token %}
+<link rel="stylesheet" href="{% static 'css/styles.css' %}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA0mFf3vITZFCtdj34zlj3XW8nU6MZZoUcR1Bq1qQ9xWhcBupzP8dfHUepBa7h" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@coreui/icons/css/all.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@coreui/coreui/dist/css/coreui.min.css">
+
 <div class="dashboard-header">
-    <h1 class="display-4">Gestão de Alunos</h1>
-    <p class="lead text-muted">Controle e comunicação com sua turma</p>
+    <h1 class="display-4">
+      Gestão de Alunos
+    </h1>
+    <p class="lead text-muted">
+      Visão acadêmica e financeira
+    </p>
 </div>
 
 <div class="row mb-4">
-    <!-- Cartão de Resumo -->
-    <div class="col-md-4">
+    <div class="col-md-3">
         <div class="card border-0 shadow-sm h-100">
-            <div class="card-body text-center d-flex flex-column justify-content-center">
-                <div class="mb-3">
-                    <i class="fas fa-users fa-3x text-primary"></i>
+            <div class="card-body">
+                <div class="d-flex">
+                    <!-- Ícone no canto superior esquerdo -->
+                    <div class="mr-3 align-self-start">  <!-- align-self-start mantém no topo -->
+                        <i class="cil-people" style="font-size: 1.8rem; color: #000000;"></i>
+                    </div>
+                    
+                    <!-- Conteúdo centralizado verticalmente -->
+                    <div class="flex-grow-1 text-center d-flex flex-column justify-content-center">
+                        <h3 class="h4 text-muted mb-3">Total de Alunos</h3>
+                        <p class="h1 mb-2 text-primary">{{ total_alunos }}</p>
+                        <small class="text-muted">Ativos no curso</small>
+                    </div>
                 </div>
-                <h2 class="card-title h5">Total de Alunos</h2>
-                <p class="display-4 mb-0 text-primary">{{ total_alunos }}</p>
-                <small class="text-muted">Sua turma atual</small>
             </div>
         </div>
     </div>
 
-    <!-- Cartão de Ações Rápidas -->
-    <div class="col-md-8">
+    <!-- Card Financeiro (37% largura) -->
+    <div class="col-md-5">
         <div class="card border-0 shadow-sm h-100">
-            <div class="card-body d-flex align-items-center">
-                <div class="w-100">
-                    <h2 class="h5 mb-4">Ações Rápidas</h2>
-                    <div class="d-flex justify-content-between">
-                        <a href="#" class="btn btn-outline-primary btn-lg px-4">
-                            <i class="fas fa-envelope mr-2"></i> Enviar Mensagem Geral
-                        </a>
-                        <a href="#" class="btn btn-outline-success btn-lg px-4">
-                            <i class="fas fa-plus-circle mr-2"></i> Adicionar Aluno
-                        </a>
-                        <a href="#" class="btn btn-outline-info btn-lg px-4">
-                            <i class="fas fa-chart-line mr-2"></i> Relatórios
-                        </a>
+            <div class="card-body">
+                <h3 class="h5"><i class="cil-chart-line"></i> Dados Financeiros</h3>
+                <div class="row mt-3">
+                    <div class="col-6 text-center border-right">
+                        <div class="text-muted small">Mensal</div>
+                        <p class="h3 text-success">{{ receita_mensal }}€</p>
                     </div>
+                    <div class="col-6 text-center">
+                        <div class="text-muted small">Anual</div>
+                        <p class="h3 text-info">{{ receita_anual }}€</p>
+                    </div>
+                </div>
+                <div class="mt-2 pt-2 border-top text-center">
+                    <small class="text-muted">
+                        <i class="cil-info"></i> 45€/aluno/mês
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card Ações Rápidas (24% largura) -->
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <h3 class="h5"><i class="cil-bolt"></i> Ações Rápidas</h3>
+                <div class="d-grid gap-2 mt-3">
+                    <a href="#" class="btn btn-outline-primary btn-sm">
+                        <i class="cil-bullhorn"></i> Anúncio
+                    </a>
+                    <a href="#" class="btn btn-outline-success btn-sm">
+                        <i class="cil-task"></i> Atividades
+                    </a>
+                    <a href="#" class="btn btn-outline-info btn-sm">
+                        <i class="cil-calendar"></i> Agenda
+                    </a>
                 </div>
             </div>
         </div>
@@ -49,13 +87,23 @@
 
 <!-- Lista de Alunos -->
 <div class="card border-0 shadow-sm">
-    <div class="card-header bg-white border-0 py-3">
-        <h2 class="h5 mb-0">Lista de Alunos</h2>
+    <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
+        <h2 class="h5 mb-0">
+            <i class="cil-list"></i> Lista de Alunos
+        </h2>
+        <div class="search-box">
+            <div class="input-group">
+                <input type="text" class="form-control form-control-sm" placeholder="Pesquisar aluno..." id="studentSearch">
+                <div class="input-group-append">
+                    <span class="input-group-text"><i class="cil-magnifying-glass"></i></span>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="card-body p-0">
-        <div class="table-responsive">
-            <table class="table table-hover mb-0">
-                <thead class="thead-light">
+        <div class="table-responsive" style="max-height: 500px !important; overflow-y: auto;">
+            <table class="table table-hover mb-0" id="studentsTable">
+                <thead class="thead-light" style="position: sticky; top: 0; z-index: 1;">
                     <tr>
                         <th class="border-0">#</th>
                         <th class="border-0">Aluno</th>
@@ -66,13 +114,13 @@
                 </thead>
                 <tbody>
                     {% for aluno in alunos %}
-                    <tr>
+                    <tr class="student-row">
                         <td class="align-middle">{{ forloop.counter }}</td>
                         <td class="align-middle">
                             <div class="d-flex align-items-center">
                                 <div class="avatar-sm mr-3">
                                     <span class="avatar-title rounded-circle bg-primary text-white">
-                                        {{ aluno.user.first_name|first|default:aluno.user.username|first|upper }}
+                                        <i class="cil-user"></i>
                                     </span>
                                 </div>
                                 <div>
@@ -82,35 +130,58 @@
                             </div>
                         </td>
                         <td class="align-middle">
-                            <a href="mailto:{{ aluno.user.email }}" class="text-primary">{{ aluno.user.email }}</a>
+                            <a href="mailto:{{ aluno.user.email }}" class="text-primary">
+                                <i class="cil-envelope-open mr-1"></i> {{ aluno.user.email }}
+                            </a>
+                            {% if aluno.user.profile.phone %}
+                            <br><small class="text-muted"><i class="cil-phone mr-1"></i>{{ aluno.user.profile.phone }}</small>
+                            {% endif %}
                         </td>
                         <td class="align-middle">
                             {% if aluno.user.last_login %}
                                 <span class="badge badge-light">
-                                    {{ aluno.user.last_login|timesince }} atrás
+                                    <i class="cil-clock mr-1"></i> {{ aluno.user.last_login|timesince }} atrás
                                 </span>
+                                <br>
+                                <small class="text-muted">{{ aluno.user.last_login|date:"d/m/Y H:i" }}</small>
                             {% else %}
-                                <span class="badge badge-secondary">Nunca acessou</span>
+                                <span class="badge badge-secondary"><i class="cil-warning"></i> Nunca acessou</span>
                             {% endif %}
                         </td>
                         <td class="align-middle text-center">
-                            <button class="btn btn-sm btn-outline-primary rounded-pill px-3 send-message-btn"
-                                    data-student-id="{{ aluno.id }}"
-                                    data-student-name="{{ aluno.user.get_full_name|default:aluno.user.username }}">
-                                <i class="far fa-paper-plane mr-1"></i> Mensagem
-                            </button>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-sm btn-outline-primary rounded-pill px-3 mr-2 send-message-btn"
+                                        data-student-id="{{ aluno.id }}"
+                                        data-student-name="{{ aluno.user.get_full_name|default:aluno.user.username }}">
+                                    <i class="cil-send mr-1"></i> Mensagem
+                                </button>
+                                <button class="btn btn-sm btn-outline-secondary rounded-circle dropdown-toggle"
+                                        data-toggle="dropdown"
+                                        aria-haspopup="true"
+                                        aria-expanded="false">
+                                    <i class="cil-options"></i>
+                                </button>
+                                <div class="dropdown-menu dropdown-menu-right shadow-sm">
+                                    <a class="dropdown-item py-2" href="#">
+                                        <i class="cil-user mr-2 text-primary"></i> Perfil
+                                    </a>
+                                    <a class="dropdown-item py-2" href="#">
+                                        <i class="cil-chart mr-2 text-info"></i> Desempenho
+                                    </a>
+                                    <div class="dropdown-divider"></div>
+                                    <a class="dropdown-item py-2 text-danger" href="#">
+                                        <i class="cil-warning mr-2"></i> Reportar
+                                    </a>
+                                </div>
+                            </div>
                         </td>
                     </tr>
                     {% empty %}
                     <tr>
                         <td colspan="5" class="text-center py-5">
                             <div class="py-5">
-                                <i class="fas fa-user-graduate fa-3x text-muted mb-3"></i>
-                                <p class="h5 text-muted">Nenhum aluno cadastrado</p>
-                                <p class="text-muted">Adicione alunos para começar a gerenciar sua turma</p>
-                                <a href="#" class="btn btn-primary mt-2">
-                                    <i class="fas fa-plus mr-1"></i> Adicionar Aluno
-                                </a>
+                                <i class="cil-education" style="font-size: 3rem; color: #9da5b1;"></i>
+                                <p class="h5 text-muted mt-3">Nenhum aluno cadastrado</p>
                             </div>
                         </td>
                     </tr>
@@ -121,36 +192,41 @@
     </div>
 </div>
 
-<!-- Modal para enviar mensagem (hidden por padrão) -->
+<!-- Modal de Mensagem -->
 <div class="modal fade" id="messageModal" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Enviar Mensagem</h5>
+                <h5 class="modal-title">
+                    <i class="cil-paper-plane"></i> Enviar Mensagem
+                </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
                 <form id="messageForm">
+                    {% csrf_token %}
                     <div class="form-group">
-                        <label>Para:</label>
+                        <label><i class="cil-user"></i> Para:</label>
                         <input type="text" id="studentName" class="form-control" readonly>
                     </div>
                     <div class="form-group">
-                        <label>Assunto:</label>
-                        <input type="text" class="form-control" required>
+                        <label><i class="cil-tag"></i> Assunto:</label>
+                        <input type="text" class="form-control" placeholder="Ex: Feedback sobre a atividade..." required>
                     </div>
                     <div class="form-group">
-                        <label>Mensagem:</label>
-                        <textarea class="form-control" rows="5" required></textarea>
+                        <label><i class="cil-comment-square"></i> Mensagem:</label>
+                        <textarea class="form-control" rows="5" placeholder="Escreva sua mensagem aqui..." required></textarea>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="cil-x"></i> Cancelar
+                </button>
                 <button type="submit" form="messageForm" class="btn btn-primary">
-                    <i class="far fa-paper-plane mr-1"></i> Enviar Mensagem
+                    <i class="cil-send"></i> Enviar
                 </button>
             </div>
         </div>
@@ -158,35 +234,54 @@
 </div>
 
 <style>
-    .avatar-sm {
-        width: 40px;
-        height: 40px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
+    /* Estilos Customizados */
+    .border-right {
+        border-right: 1px solid #e1e5eb !important;
     }
-    .avatar-title {
-        font-weight: 600;
-        font-size: 1.1rem;
+    .d-grid.gap-2 {
+        display: grid;
+        gap: 0.5rem;
     }
-    .send-message-btn {
-        transition: all 0.2s;
+    .card-body .display-4 {
+        font-size: 2.5rem;
     }
-    .send-message-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+    .card-body .h3 {
+        font-size: 1.75rem;
     }
-    .table-hover tbody tr {
-        transition: all 0.2s;
+    .border-right {
+        border-right: 1px solid #e1e5eb !important;
     }
-    .table-hover tbody tr:hover {
-        transform: translateX(4px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    .btn-action {
+        min-width: 120px;
+        padding: 0.5rem;
+    }
+    .avatar-sm i.cil {
+        font-size: 1rem;
+    }
+    .table-responsive::-webkit-scrollbar {
+        width: 8px;
+    }
+    .table-responsive::-webkit-scrollbar-thumb {
+        background-color: rgba(0,0,0,0.1);
+        border-radius: 4px;
+    }
+    .student-row:hover {
+        background-color: #f8f9fa;
     }
 </style>
 
 <script>
 $(document).ready(function() {
+    // Busca de alunos
+    $('#studentSearch').keyup(function() {
+        var searchText = $(this).val().toLowerCase();
+        $('.student-row').each(function() {
+            var rowText = $(this).text().toLowerCase();
+            $(this).toggle(rowText.indexOf(searchText) > -1);
+        });
+    });
+
+    // Modal de mensagem
     $('.send-message-btn').click(function() {
         var studentName = $(this).data('student-name');
         $('#studentName').val(studentName);

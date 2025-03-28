@@ -49,8 +49,9 @@
         }
         .main-content {
             flex-grow: 1;
+            padding: 40px 20px;
+            margin-left: 80px;
             transition: margin-left 0.3s;
-            padding: 20px;
         }
         .sidebar:hover + .main-content {
             margin-left: 250px;
@@ -102,8 +103,8 @@
             <li class="nav-item"><a class="nav-link" href="{% url 'aulas' %}"><i class="nav-icon cil-education"></i> CURSO</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'materiais' %}"><i class="nav-icon cil-folder"></i> MATERIAIS</a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'praticar' %}"><i class="nav-icon cil-casino"></i> PRATICAR</a></li>
+            <li class="nav-item"><a class="nav-link" href="{% url 'listar_topicos' %}"><i class="nav-icon cil-chat-bubble"></i> FORÚM </a></li>
             <li class="nav-item"><a class="nav-link" href="{% url 'dicionario' %}"><i class="nav-icon cil-book"></i> DICIONÁRIO <span class="badge bg-warning">Breve</span></a></li>
-            <li class="nav-item"><a class="nav-link" href="#"><i class="nav-icon cil-chat-bubble"></i> FORÚM <span class="badge bg-warning">Breve</span></a></li>
             <li class="nav-item mt-auto"><a class="nav-link" href="{% url 'contato' %}"><i class="nav-icon cil-info"></i> AJUDA</a></li>
             <li class="nav-item">
                 <form action="{% url 'logout' %}" method="post">

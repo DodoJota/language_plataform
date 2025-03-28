@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ topico.titulo }}{% endblock %}
+
+{% block content %}
+<div class="container mt-1">
+    <div class="col">
+        <div class="col-lg-12">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="display-4">{{ topico.titulo }}</h2>
+                <a href="{% url 'listar_topicos' %}" class="btn btn-secondary">
+                    <i class="cil-arrow-left"></i> Voltar ao Fórum
+                </a>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title">{{ topico.titulo }}</h5>
+                        <small class="text-muted">{{ topico.data_criacao|date:"d/m/Y H:i" }}</small>
+                    </div>
+                    <p class="card-text">{{ topico.conteudo }}</p>
+                    <small class="text-muted">Postado por {{ topico.autor }}</small>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="display-5">Respostas</h3>
+                <span class="badge bg-primary rounded-pill">{{ respostas.count }}</span>
+            </div>
+
+            {% if respostas %}
+                <div class="list-group mb-4">
+                    {% for resposta in respostas %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <strong>{{ resposta.autor }}</strong>
+                            <small class="text-muted">{{ resposta.data_criacao|date:"d/m/Y H:i" }}</small>
+                        </div>
+                        <p class="mb-1">{{ resposta.conteudo }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info" role="alert">
+                    Nenhuma resposta ainda. Seja o primeiro a responder!
+                </div>
+            {% endif %}
+
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title mb-3">Responder</h4>
+                    <form method="post" action="{% url 'responder_topico' topico.id %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <textarea id="conteudo" name="conteudo" class="form-control" rows="3" 
+                                      placeholder="Digite sua resposta aqui..." required></textarea>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-success">
+                                <i class="cil-send"></i> Enviar Resposta
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

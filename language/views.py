@@ -5,9 +5,8 @@ from django.contrib import messages
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.core.files.storage import FileSystemStorage
-from .models import Material, Contato, Video, Teacher, Student
-
-from django.shortcuts import get_object_or_404
+from .models import Material, Contato, Video, Teacher, Student, Topico, Resposta
+from .forms import TopicoForm, RespostaForm
 
 
 @login_required
@@ -19,8 +18,9 @@ def teacher(request):
         'total_aulas': Video.objects.count(),
         'aulas_video': Video.objects.filter(arquivo='video').count(),
         'total_materiais': Material.objects.count(),
-        'materiais_pdf': Material.objects.filter(tipo='PDF').count(),  # Alterado para usar o campo 'tipo'
-        'materiais_outros': Material.objects.exclude(tipo='PDF').count(),  # Conta tudo que não é PDF
+        'materiais_pdf': Material.objects.filter(tipo='PDF').count(),
+        'materiais_outros': Material.objects.exclude(tipo='PDF').count(),
+        'total_alunos': Student.objects.count(),  # Adicione esta linha
     }
     return render(request, 'teacher.html', context)
 
@@ -29,12 +29,20 @@ def students_dashboard(request):
     try:
         teacher = Teacher.objects.get(user=request.user)
         alunos = teacher.students.all().select_related('user')
+        total_alunos = alunos.count()
+        
+        # Cálculo financeiro (45€ por aluno/mês)
+        receita_mensal = total_alunos * 45
+        receita_anual = receita_mensal * 12
+
     except Teacher.DoesNotExist:
         return redirect('login')
 
     context = {
         'alunos': alunos,
-        'total_alunos': alunos.count(),
+        'total_alunos': total_alunos,
+        'receita_mensal': receita_mensal,
+        'receita_anual': receita_anual,
     }
     return render(request, 'students.html', context)
 
@@ -227,6 +235,42 @@ def deletar_video(request, video_id):
     # Redireciona de volta para a página de envio de vídeos
     return redirect('enviar_videos')
 
+def listar_topicos(request):
+    topicos = Topico.objects.all().order_by('-data_criacao')
+    return render(request, 'forum/listar_topicos.html', {'topicos': topicos})
+
+def visualizar_topico(request, topico_id):
+    topico = get_object_or_404(Topico, id=topico_id)
+    respostas = topico.respostas.all()
+    return render(request, 'forum/visualizar_topico.html', {'topico': topico, 'respostas': respostas})
+
+@login_required
+def criar_topico(request):
+    if request.method == 'POST':
+        form = TopicoForm(request.POST)
+        if form.is_valid():
+            topico = form.save(commit=False)
+            topico.autor = request.user
+            topico.save()
+            return redirect('listar_topicos')
+    else:
+        form = TopicoForm()
+    return render(request, 'forum/criar_topico.html', {'form': form})
+
+@login_required
+def responder_topico(request, topico_id):
+    topico = get_object_or_404(Topico, id=topico_id)
+    if request.method == 'POST':
+        form = RespostaForm(request.POST)
+        if form.is_valid():
+            resposta = form.save(commit=False)
+            resposta.autor = request.user
+            resposta.topico = topico
+            resposta.save()
+            return redirect('visualizar_topico', topico_id=topico.id)
+    else:
+        form = RespostaForm()
+    return render(request, 'forum/responder_topico.html', {'form': form, 'topico': topico})
 
 ##############################################################
 

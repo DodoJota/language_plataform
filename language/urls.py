@@ -19,13 +19,17 @@ urlpatterns = [
     path('dicionario/', views.dicionario, name='dicionario'),
     path('contato/', views.contato, name='contato'),
     path("login/", views.login_view, name="login"),
-    path("logout/", logout_view, name="logout"),
+    path("logout/", views.logout_view, name="logout"),
     path('create_user/', views.create_user, name='create_user'),
     path('teacher/', views.teacher, name='teacher'),
     path('enviar_materiais/', views.enviar_materiais, name='enviar_materiais'),
     path('deletar_material/<int:material_id>/', views.deletar_material, name='deletar_material'),
     path('enviar_videos/', views.enviar_videos, name='enviar_videos'),
     path('deletar_video/<int:video_id>/', views.deletar_video, name='deletar_video'),
+    path('forum/', views.listar_topicos, name='listar_topicos'),
+    path('forum/<int:topico_id>/', views.visualizar_topico, name='visualizar_topico'),
+    path('forum/criar/', views.criar_topico, name='criar_topico'),
+    path('forum/<int:topico_id>/responder/', views.responder_topico, name='responder_topico'),
 ]
 
 if settings.DEBUG:
